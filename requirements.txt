@@ -16,5 +16,4 @@ python-dotenv==0.10.2
 python-editor==1.0.4
 six==1.12.0
 SQLAlchemy==1.3.3
--e git+git@github.com:cass-android/weather.git@dde964ad4df54efd3b21f53f62e02117776edbb9#egg=weather
 Werkzeug==0.15.2
