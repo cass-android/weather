@@ -14,5 +14,3 @@ def hello_name(name):
 
 if __name__ == '__main__':
     app.run()
-
-print(os.environ['APP_SETTINGS'])
