@@ -17,9 +17,21 @@ class Station(db.Model):
 		
 class Historical(db.Model):
 	__tablename__ = 'historicals'
+	year = db.Column(db.Integer)
+	month = db.Column(db.Integer)
+	day = db.Column(db.Integer)
+	time = db.Column(db.Integer)
 	datetime = db.Column(db.DateTime, primary_key=True)
 	drybulb = db.Column(db.Integer)
-	wetbulb = db.Column(db.Integer)
+	dewpoint = db.Column(db.Integer)
+	relative_humidity = db.Column(db.Integer)
+	wind_dir_10s_deg = db.Column(db.Integer)
+	wind_spd_kmh = db.Column(db.Integer)
+	visibility_km = db.Column(db.Integer)
+	stn_press_kpa = db.Column(db.Integer)
+	hmdx = db.Column(db.Integer)
+	wind_chill = db.Column(db.Integer)
+	weather = db.Column(db.Integer)
 	
 	def __init__(self, drybulb, wetbulb):
 		self.drybulb = drybulb
