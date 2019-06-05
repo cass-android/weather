@@ -1,5 +1,9 @@
-from app import db
+"""
+models imports app, so app can't import models
+"""
+
 from sqlalchemy.dialects.postgresql import JSON
+from app import db
 
 class Station(db.Model):
 	__tablename__ = 'stations'
