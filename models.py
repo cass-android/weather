@@ -40,9 +40,10 @@ class Historical(db.Model):
 	def __init__(self, drybulb, wetbulb):
 		self.drybulb = drybulb
 		self.wetbulb = wetbulb
+		self.timestamp = datetime
 
 	def __repr__(self):
-		return '<id {}>'.format(self.id)	
+		return '<timestamp {}>'.format(self.datetime)
 
 class Forecast(db.Model):
 	__tablename__ = 'forecasts'

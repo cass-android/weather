@@ -2,24 +2,41 @@
 views imports app and models; these don't import views
 """
 
-from flask import render_template
+from flask import render_template, request
 from app import app
 from models import Historical, Forecast, Station
 
+import plotly
+import plotly.graph_objs as go 
+
+import pandas as pd
+import numpy as np 
+import json
+
+
 @app.route('/')
-def index():
-    df = Historical.query().all()
-    chart_data = df.to_dict(orient='records')
-    chart_data = json.dumps(chart_data, indent=2)
-    data = {'chart_data': chart_data}
-    return render_template("index.html", data=data)    
+def index():   
+
+    line = create_plot()
+    return render_template("index.html", plot=line)    
     
-def hello():
-    return "Hello World!"
+def create_plot():
+ 	N = 40
+ 	x = [x.datetime for x in Historical.query.all()]
+ 	y = [x.drybulb for x in Historical.query.all()]
 
-@app.route('/<name>')
-def hello_name(name):
-	return "Hello {}!".format(name)
+ 	data = [
+ 		go.Line(
+ 			x=x,
+ 			y=y
+ 			)
+ 		]
+ 	graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+ 	return graphJSON
+
+ 	"""
+ 	df = pd.DataFrame(Historical.query.all())
+    chart_data = json.loads(df.to_json(orient='records'))    
+    data = {'chart_data': chart_data}
+"""

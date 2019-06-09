@@ -1,7 +1,7 @@
 """ 
 this module is where the flask instance and database live. 
 It's imported in a lot of other places, so keep it thin to
-avoid circular import problems!
+avoid circular imports
 """
 
 from flask import Flask
