@@ -94,11 +94,18 @@ def download_year(year,startmt=1,endmt=12):
     year_df = year_df.loc[(year_df.index < today)]
     return year_df
 
-def add_data(year, name):
+def add_data(name, year=""):
       # Saves to psql db
     engine = create_engine("postgresql://localhost/weather")
-    data = download_year(year)
-    data.to_sql(name=name, con=engine, if_exists='append')
+    if name=='historicals':
+      data = download_year(year)
+      exists = 'append'
+    elif name=='forecasts':
+      data = scrape_forecast()
+      exists = 'replace'
+    else:
+      print('invalid name')
+    data.to_sql(name=name, con=engine, if_exists=exists)
 
 def scrape_forecast():
 # Function returns a dataframe with 10-day ahead 24-h weather forecast, starting day after the current day
