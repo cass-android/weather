@@ -15,7 +15,7 @@ import numpy as np
 import json
 
 
-@app.route('/weather')
+@app.route('/')
 def index():   
 
     line = create_plot()
