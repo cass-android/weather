@@ -188,11 +188,7 @@ def scrape_forecast():
     
     
     forecast_out = forecast_out[[
-        'year',
-        'month',
-        'weekday',
-        'day',
-        'time',
+        'datetime',
         'drybulb',
         'dewpoint',
         'relative_humidity'

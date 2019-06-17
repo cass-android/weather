@@ -48,11 +48,6 @@ class Historical(db.Model):
 class Forecast(db.Model):
 	__tablename__ = 'forecasts'
 	datetime = db.Column(db.DateTime, primary_key=True)
-	year = db.Column(db.Integer)
-	month = db.Column(db.Integer)
-	weekday = db.Column(db.Integer)
-	day = db.Column(db.Integer)
-	time = db.Column(db.Integer)
 	drybulb = db.Column(db.Integer)
 	dewpoint = db.Column(db.Integer)
 	relative_humidity = db.Column(db.Integer)
