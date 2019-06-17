@@ -5,6 +5,7 @@ import re
 from bs4 import BeautifulSoup as bs
 from dateutil.relativedelta import *
 from sqlalchemy import create_engine
+import os
 
 ############################################ government canada hourly historical weather #######################################
 ############### Downloads hourly weather data from government canada website, for user specified time period ####################
@@ -96,13 +97,13 @@ def download_year(year,startmt=1,endmt=12):
 
 def add_data(name, year=""):
       # Saves to psql db
-    engine = create_engine("postgresql://localhost/weather")
+    engine = create_engine(os.environ['DATABASE_URL'])
     if name=='historicals':
       data = download_year(year)
       exists = 'append'
     elif name=='forecasts':
       data = scrape_forecast()
-      exists = 'replace'
+      exists = 'append'
     else:
       print('invalid name')
     data.to_sql(name=name, con=engine, if_exists=exists)
@@ -188,7 +189,6 @@ def scrape_forecast():
     
     
     forecast_out = forecast_out[[
-        'datetime',
         'drybulb',
         'dewpoint',
         'relative_humidity'
