@@ -7,7 +7,19 @@ from dateutil.relativedelta import *
 from sqlalchemy import create_engine
 import os
 from app import db
-from models import Historical, Forecast, Station
+from models import Historical, Forecast, Station, Current
+
+def add_current():
+    session = db.session     # Creates a SQLAlchemy Session
+        
+    try:
+        row = get_current()
+        data = Current(id=row['id'], drybulb=row['drybulb'], relative_humidity=row['relative_humidity'])
+        session.merge(data)
+        session.commit()
+
+    except:
+        print('something messed up')
 
 def add_historicals(year):
     session = db.session     # Creates a SQLAlchemy Session
@@ -34,6 +46,18 @@ def add_forecasts():
 
     except:
         print('something messed up')  
+
+# current weather
+def get_current():
+    url = 'http://api.openweathermap.org/data/2.5/weather?id=6167865&APPID=631d59f50ab1841ba7af0f0f706e1505'
+    r = requests.get(url, verify=True).json()
+    if response:
+        row={'id': datetime.datetime.now(),
+             'drybulb':r['main']['temp']-272.15,
+             'relative_humidity':r['main']['humidity']}
+        return row
+    else:
+        print('Error!')
 
 def get_historicals(year,startmt=1,endmt=12): 
     df = pd.DataFrame()     
