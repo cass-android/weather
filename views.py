@@ -24,10 +24,10 @@ def index():
 def create_plot():
  	N = 40
  	today = datetime.date.today()
- 	x1 = [x.datetime for x in Historical.query.filter(Historical.datetime >= today - datetime.timedelta(days=7))]
- 	y1 = [x.drybulb for x in Historical.query.filter(Historical.datetime >= today - datetime.timedelta(days=7))]
+ 	x1 = [x.id for x in Historical.query.filter(Historical.id >= today - datetime.timedelta(days=7)).order_by(Historical.id)]
+ 	y1 = [x.drybulb for x in Historical.query.filter(Historical.id >= today - datetime.timedelta(days=7)).order_by(Historical.id)]
 
- 	x2 = [x.datetime for x in Forecast.query.all()]
+ 	x2 = [x.id for x in Forecast.query.all()]
  	y2 = [x.drybulb for x in Forecast.query.all()]
 
  	historicals = go.Line(

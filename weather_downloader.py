@@ -6,7 +6,71 @@ from bs4 import BeautifulSoup as bs
 from dateutil.relativedelta import *
 from sqlalchemy import create_engine
 import os
+from app import db
+from models import Historical, Forecast, Station
 
+def add_historicals(year):
+    session = db.session     # Creates a SQLAlchemy Session
+        
+    try:
+        df = get_historicals(year)
+        for row in df.itertuples(): 
+            data = Historical(id=row[0], drybulb=row[1], dewpoint=row[2])
+            session.merge(data)
+            session.commit()
+
+    except:
+        print('something messed up')
+
+def add_forecasts():
+    session = db.session     # Creates a SQLAlchemy Session
+        
+    try:
+        df = get_forecasts()
+        for row in df.itertuples(): 
+            data = Forecast(id=row[0], drybulb=row[1], relative_humidity=row[2])
+            session.merge(data)
+            session.commit()
+
+    except:
+        print('something messed up')  
+
+def get_historicals(year,startmt=1,endmt=12): 
+    df = pd.DataFrame()     
+    year_df = pd.DataFrame()
+    yr = year
+    
+    months = list(range(startmt,endmt+1))
+    for month in months:    
+        # Downloads month and appends to year
+        year_df = year_df.append(download_month(month, year))
+     
+    # Removes future timestamps (these are in the dataset)
+    today = str(datetime.date.today())
+    year_df = year_df.loc[(year_df.index < today)]
+    return year_df
+
+def get_forecasts():
+    # 5-day 3-h forecast (only free one available)
+    url = 'http://api.openweathermap.org/data/2.5/forecast?id=6167865&APPID=631d59f50ab1841ba7af0f0f706e1505'
+    response = requests.get(url, verify=True)
+    r = response.json()
+    
+    if response:
+        df=pd.DataFrame()
+        for dt in r['list']:    
+            row={'datetime':dt['dt_txt'],'drybulb':dt['main']['temp']-273.15,'relative_humidity':dt['main']['humidity']}
+            # note: Kelvin to Celcius
+            
+            df = df.append(row, ignore_index=True)
+        df.set_index(pd.DatetimeIndex(df['datetime']), inplace=True)
+        return df[['drybulb', 'relative_humidity']]        
+
+    else:
+        print('Response Error')
+
+
+def download_month(month, year, station = 31688):
 ############################################ government canada hourly historical weather #######################################
 ############### Downloads hourly weather data from government canada website, for user specified time period ####################
 
@@ -17,7 +81,6 @@ import os
 # 48549 - Toronto City Centre - missing data?
 # 31688 - Toronto City
 
-def download_month(month, year, station = 31688):
     yr = year
     m = month
     if month >= 4 and year == 2018:
@@ -73,44 +136,22 @@ def download_month(month, year, station = 31688):
     })
 
     # Sets index to DateTime:
-    month_df = month_df.set_index('datetime')
+    month_df = month_df.set_index(pd.DatetimeIndex(month_df['datetime']))
 
     # Changes hour to an integer
     # month_df['time'] = pd.to_numeric(month_df['time'].fillna(0), errors='coerce')
 
-    return month_df
+    return month_df[[
+        'drybulb',
+        'dewpoint'
+    ]].fillna(0)
 
-def download_year(year,startmt=1,endmt=12): 
-    df = pd.DataFrame()     
-    year_df = pd.DataFrame()
-    yr = year
-    
-    months = list(range(startmt,endmt+1))
-    for month in months:    
-        # Downloads month and appends to year
-        year_df = year_df.append(download_month(month, year))
-     
-    # Removes future timestamps (these are in the dataset)
-    today = str(datetime.date.today())
-    year_df = year_df.loc[(year_df.index < today)]
-    return year_df
 
-def add_data(name, year=""):
-      # Saves to psql db
-    engine = create_engine(os.environ['DATABASE_URL'])
-    if name=='historicals':
-      data = download_year(year)
-      exists = 'append'
-    elif name=='forecasts':
-      data = scrape_forecast()
-      exists = 'append'
-    else:
-      print('invalid name')
-    data.to_sql(name=name, con=engine, if_exists=exists)
-
+   
 def scrape_forecast():
-# Function returns a dataframe with 10-day ahead 24-h weather forecast, starting day after the current day
-# Full URL: https://www.wunderground.com/hourly/ca/toronto/date/2018-9-25?cm_ven=localwx_hour
+    # NOTE: this is no longer working reliably, I think they are blocking me or something. Replaced with 'get_forecast()'
+    # Function returns a dataframe with 10-day ahead 24-h weather forecast, starting day after the current day
+    # Full URL: https://www.wunderground.com/hourly/ca/toronto/date/2018-9-25?cm_ven=localwx_hour
 
     days_ahead = 1 
     forecast_out = pd.DataFrame() # Will contain 'day_out' for all days in days_ahead 
@@ -187,16 +228,10 @@ def scrape_forecast():
 
     },inplace=True)
     
-    
-    forecast_out = forecast_out[[
+    return forecast_out[[
         'drybulb',
-        'dewpoint',
-        'relative_humidity'
-    ]]
-
-
-
-    return forecast_out
+        'dewpoint'
+    ]].fillna(0)
 
 def parse_row(row_in):
 # Function returns a list containing data as strings, for a single 'row_in'
@@ -216,4 +251,3 @@ def parse_row(row_in):
         row_out.append(cell_out)
         
     return row_out
-    

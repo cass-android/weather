@@ -26,7 +26,8 @@ class Historical(db.Model):
 	dewpoint = db.Column(db.Integer)
 	relative_humidity = db.Column(db.Integer)
 	
-	def __init__(self, drybulb, dewpoint):
+	def __init__(self, id, drybulb, dewpoint):
+		self.id = id
 		self.drybulb = drybulb
 		self.dewpoint = dewpoint
 
@@ -39,13 +40,13 @@ class Forecast(db.Model):
 	__tablename__ = 'forecasts'
 	id = db.Column(db.DateTime, primary_key=True)
 	drybulb = db.Column(db.Integer)
-	dewpoint = db.Column(db.Integer)
 	relative_humidity = db.Column(db.Integer)
 
 	
-	def __init__(self, drybulb, wetbulb):
+	def __init__(self, id, drybulb, relative_humidity):
+		self.id = id
 		self.drybulb = drybulb
-		self.dewpoint = dewpoint
+		self.relative_humidity = relative_humidity
 
 	def __repr__(self):
 		return '<id {}>'.format(self.id)		
