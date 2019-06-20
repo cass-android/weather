@@ -51,7 +51,7 @@ def add_forecasts():
 def get_current():
     url = 'http://api.openweathermap.org/data/2.5/weather?id=6167865&APPID=631d59f50ab1841ba7af0f0f706e1505'
     r = requests.get(url, verify=True).json()
-    if response:
+    if r:
         row={'id': datetime.datetime.now(),
              'drybulb':r['main']['temp']-272.15,
              'relative_humidity':r['main']['humidity']}
