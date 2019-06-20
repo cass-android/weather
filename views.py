@@ -55,29 +55,42 @@ def create_plot():
     y3 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=2),
         Forecast.retrieval_time < now - datetime.timedelta(minutes=2875)).order_by(Forecast.id)]
 
-    historicals = go.Line(
+    historicals = go.Scatter(
             x=x00,
             y=y00,
-            name='historicals'
+            name='historicals',
+            line=dict(
+                color = ('rgb(192,192,192)'),
+                width = 2,)
             )
 
-    actuals = go.Line(
+    actuals = go.Scatter(
             x=x0,
             y=y0,
-            name='actuals'
+            name='actuals',
+            mode='lines',
+            line=dict(
+                color = ('rgb(192,192,192)'),
+                width = 2,)
             )
     
 
-    forecasts_1d = go.Line(
+    forecasts_1d = go.Scatter(
             x=x2,
             y=y2,
-            name='forecasts_1d'
+            name='forecasts_1d',
+            line=dict(
+                color = ('rgb(192,192,192)'),
+                width = 2,)
             )
 
-    forecasts_2d = go.Line(
+    forecasts_2d = go.Scatter(
             x=x3,
             y=y3,
-            name='forecasts_2d'
+            name='forecasts_2d',
+            line=dict(
+                color = ('rgb(192,192,192)'),
+                width = 2,)
             )
 
     data = [historicals, actuals, forecasts_1d, forecasts_2d]
