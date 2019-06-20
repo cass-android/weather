@@ -30,12 +30,13 @@ def create_plot():
     x0 = [x.id for x in Current.query.all()]
     y0 = [x.drybulb for x in Current.query.all()]
 
-    # latest forecast (retrieved hourly)
-    # just select the latest 
+    # latest forecast (retrieved within the last hour)
     
-    # x1 = 
+    x1 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=1))
+          .order_by(Forecast.id)]
 
-    # y1 =   
+    y1 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=1))
+          .order_by(Forecast.id)]  
         
     # retrieved on roughly this hour, 1d ago
     # datetime greater than now minus 1d; less than five minutes after now minus 1d
@@ -70,17 +71,25 @@ def create_plot():
             name='actuals',
             mode='lines',
             line=dict(
-                color = ('rgb(192,192,192)'),
+                color = ('rgb(10,128,0)'),
                 width = 2,)
             )
     
+    forecasts_0d = go.Scatter(
+            x=x1,
+            y=y1,
+            name='forecasts_0d',
+            line=dict(
+                color = ('rgb(0,51,102)'),
+                width = 2,)
+            )
 
     forecasts_1d = go.Scatter(
             x=x2,
             y=y2,
             name='forecasts_1d',
             line=dict(
-                color = ('rgb(192,192,192)'),
+                color = ('rgb(0,76,153)'),
                 width = 2,)
             )
 
@@ -89,11 +98,11 @@ def create_plot():
             y=y3,
             name='forecasts_2d',
             line=dict(
-                color = ('rgb(192,192,192)'),
+                color = ('rgb(0,102,204)'),
                 width = 2,)
             )
 
-    data = [historicals, actuals, forecasts_1d, forecasts_2d]
+    data = [historicals, actuals, forecasts_0d, forecasts_1d, forecasts_2d]
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
     return graphJSON

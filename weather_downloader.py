@@ -14,7 +14,11 @@ def add_current():
         
     try:
         row = get_current()
-        data = Current(id=row['id'], drybulb=row['drybulb'], relative_humidity=row['relative_humidity'])
+        data = Current(
+            id=row['id'], 
+            drybulb=row['drybulb'], 
+            relative_humidity=row['relative_humidity']
+            )
         session.merge(data)
         session.commit()
 
@@ -27,7 +31,11 @@ def add_historicals(year):
     try:
         df = get_historicals(year)
         for row in df.itertuples(): 
-            data = Historical(id=row[0], drybulb=row[1], dewpoint=row[2])
+            data = Historical(
+                id=row[0], 
+                drybulb=row[1], 
+                dewpoint=row[2]
+                )
             session.merge(data)
             session.commit()
 
@@ -40,10 +48,12 @@ def add_forecasts():
     try:
         df = get_forecasts()
         for row in df.itertuples(): 
-            data = Forecast(id=row[0], 
+            data = Forecast(
+                            id=row[0], 
                             retrieval_time=row[1],
                             drybulb=row[2], 
-                            relative_humidity=row[3])
+                            relative_humidity=row[3]
+                            )
             session.merge(data)
             session.commit()
 

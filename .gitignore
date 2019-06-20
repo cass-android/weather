@@ -135,4 +135,7 @@ venv
 *.pyc
 .DS_Store
 
+# jupyter notebooks
+.ipynb
+
 # End of https://www.gitignore.io/api/flask
