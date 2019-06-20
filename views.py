@@ -4,7 +4,7 @@ views imports app and models; these don't import views
 
 from flask import render_template, request
 from app import app
-from models import Historical, Forecast, Station
+from models import Historical, Forecast, Station, Current
 import datetime
 
 import plotly
@@ -30,6 +30,9 @@ def create_plot():
  	x2 = [x.id for x in Forecast.query.all()]
  	y2 = [x.drybulb for x in Forecast.query.all()]
 
+ 	x3 = [x.id for x in Current.query.all()]
+ 	y3 = [x.drybulb for x in Current.query.all()]
+
  	historicals = go.Line(
  			x=x1,
  			y=y1,
@@ -42,7 +45,13 @@ def create_plot():
  			name='forecasts'
  			)
 
- 	data = [historicals, forecasts]
+ 	current_day = go.Line(
+ 			x=x3,
+ 			y=y3,
+ 			name='current day'
+ 			)
+
+ 	data = [historicals, forecasts, current_day]
  	graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
  	return graphJSON
