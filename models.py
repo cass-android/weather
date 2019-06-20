@@ -53,11 +53,13 @@ class Current(db.Model):
 class Forecast(db.Model):
 	__tablename__ = 'forecasts'
 	id = db.Column(db.DateTime, primary_key=True)
+	retrieval_time = db.Column(db.DateTime, primary_key=True)
 	drybulb = db.Column(db.Integer)
 	relative_humidity = db.Column(db.Integer)
 
-	
-	def __init__(self, id, drybulb, relative_humidity):
+
+	def __init__(self, id, retrieval_time, drybulb, relative_humidity):
+		self.retrieval_time = retrieval_time
 		self.id = id
 		self.drybulb = drybulb
 		self.relative_humidity = relative_humidity

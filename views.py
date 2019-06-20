@@ -22,42 +22,65 @@ def index():
     return render_template("index.html", plot=line)    
     
 def create_plot():
- 	N = 40
- 	today = datetime.date.today()
- 	x1 = [x.id for x in Historical.query.filter(Historical.id >= today - datetime.timedelta(days=7)).order_by(Historical.id)]
- 	y1 = [x.drybulb for x in Historical.query.filter(Historical.id >= today - datetime.timedelta(days=7)).order_by(Historical.id)]
+    N = 40
+    now = datetime.datetime.now()
+    x00 = [x.id for x in Historical.query.filter(Historical.id >= now - datetime.timedelta(days=7)).order_by(Historical.id)]
+    y00 = [x.drybulb for x in Historical.query.filter(Historical.id >= now - datetime.timedelta(days=7)).order_by(Historical.id)]
 
- 	x2 = [x.id for x in Forecast.query.all()]
- 	y2 = [x.drybulb for x in Forecast.query.all()]
+    x0 = [x.id for x in Current.query.all()]
+    y0 = [x.drybulb for x in Current.query.all()]
 
- 	x3 = [x.id for x in Current.query.all()]
- 	y3 = [x.drybulb for x in Current.query.all()]
+    # latest forecast (retrieved hourly)
+    # just select the latest 
+    
+    # x1 = 
 
- 	historicals = go.Line(
- 			x=x1,
- 			y=y1,
- 			name='historicals'
- 			)
+    # y1 =   
+        
+    # retrieved on roughly this hour, 1d ago
+    # datetime greater than now minus 1d; less than five minutes after now minus 1d
+    
+    x2 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=1),
+        Forecast.retrieval_time < now - datetime.timedelta(minutes=1435)).order_by(Forecast.id)]
 
- 	forecasts = go.Line(
- 			x=x2,
- 			y=y2,
- 			name='forecasts'
- 			)
+    y2 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=1),
+        Forecast.retrieval_time < now - datetime.timedelta(minutes=1435)).order_by(Forecast.id)]
 
- 	current_day = go.Line(
- 			x=x3,
- 			y=y3,
- 			name='current day'
- 			)
+    # retrieved on roughly this hour, 2d ago
+    # datetime greater than now minus 2d; less than five minutes after now minus 2d
+    
+    x3 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=2),
+        Forecast.retrieval_time < now - datetime.timedelta(minutes=2875)).order_by(Forecast.id)]
 
- 	data = [historicals, forecasts, current_day]
- 	graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+    y3 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=2),
+        Forecast.retrieval_time < now - datetime.timedelta(minutes=2875)).order_by(Forecast.id)]
 
- 	return graphJSON
+    historicals = go.Line(
+            x=x00,
+            y=y00,
+            name='historicals'
+            )
 
- 	"""
- 	df = pd.DataFrame(Historical.query.all())
-    chart_data = json.loads(df.to_json(orient='records'))    
-    data = {'chart_data': chart_data}
-"""
+    actuals = go.Line(
+            x=x0,
+            y=y0,
+            name='actuals'
+            )
+    
+
+    forecasts_1d = go.Line(
+            x=x2,
+            y=y2,
+            name='forecasts_1d'
+            )
+
+    forecasts_2d = go.Line(
+            x=x3,
+            y=y3,
+            name='forecasts_2d'
+            )
+
+    data = [historicals, actuals, forecasts_1d, forecasts_2d]
+    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
+
+    return graphJSON

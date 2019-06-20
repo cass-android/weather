@@ -40,12 +40,15 @@ def add_forecasts():
     try:
         df = get_forecasts()
         for row in df.itertuples(): 
-            data = Forecast(id=row[0], drybulb=row[1], relative_humidity=row[2])
+            data = Forecast(id=row[0], 
+                            retrieval_time=row[1],
+                            drybulb=row[2], 
+                            relative_humidity=row[3])
             session.merge(data)
             session.commit()
 
     except:
-        print('something messed up')  
+        print('something messed up') 
 
 # current weather
 def get_current():
@@ -83,12 +86,15 @@ def get_forecasts():
     if response:
         df=pd.DataFrame()
         for dt in r['list']:    
-            row={'datetime':dt['dt_txt'],'drybulb':dt['main']['temp']-273.15,'relative_humidity':dt['main']['humidity']}
+            row={'datetime':dt['dt_txt'],
+                 'retrieval_time':datetime.datetime.now(),
+                 'drybulb':dt['main']['temp']-273.15,
+                 'relative_humidity':dt['main']['humidity']}
             # note: Kelvin to Celcius
             
             df = df.append(row, ignore_index=True)
         df.set_index(pd.DatetimeIndex(df['datetime']), inplace=True)
-        return df[['drybulb', 'relative_humidity']]        
+        return df[['retrieval_time','drybulb', 'relative_humidity']]        
 
     else:
         print('Response Error')
