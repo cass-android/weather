@@ -64,10 +64,10 @@ def create_plot():
     # hourly for past n hours 
     for n in range(1,24):
         x = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=n),
-            Forecast.retrieval_time < now - datetime.timedelta(minutes=355)).order_by(Forecast.id)]
+            Forecast.retrieval_time < now - datetime.timedelta(minutes=60*n-5)).order_by(Forecast.id)]
 
         y = [x.drybulb for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=n),
-            Forecast.retrieval_time < now - datetime.timedelta(minutes=355)).order_by(Forecast.id)]   
+            Forecast.retrieval_time < now - datetime.timedelta(minutes=60*n-5)).order_by(Forecast.id)]   
 
 
         forecasts = go.Scatter(
