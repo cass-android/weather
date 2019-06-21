@@ -77,14 +77,14 @@ def create_plot():
             name='actuals',
             mode='lines',
             line=dict(
-                color = ('rgb(10,128,0)'),
-                width = 2,)
+                color = ('rgb(255,0,127)'),
+                width = 3,)
             )
     
-    forecasts_0d = go.Scatter(
+    forecasts_latest = go.Scatter(
             x=x1,
             y=y1,
-            name='forecasts_0d',
+            name='forecasts_latest',
             line=dict(
                 color = ('rgb(0,51,102)'),
                 width = 2,)
@@ -119,19 +119,23 @@ def create_plot():
 
     layout = go.Layout(
     title=go.layout.Title(
-        text='Forecast Accuracy Tracker',
-        xref='paper',
-        x=0
+        text='Weather Forecast Tracker',
+            font=dict(
+                family='Helvetica, monospace',
+                size=20
+	            )
     ),
+
     xaxis=go.layout.XAxis(
         title=go.layout.xaxis.Title(
-            text='Date',
+            text='Week of {}'.format((now - datetime.timedelta(days=now.weekday())).date()),
             font=dict(
                 family='Helvetica, monospace',
                 size=18
             )
         )
     ),
+
     yaxis=go.layout.YAxis(
         title=go.layout.yaxis.Title(
             text='Degrees C',
@@ -145,7 +149,7 @@ def create_plot():
 
     
 
-    data = [historicals, actuals, forecasts_0d, forecasts_6h, forecasts_1d, forecasts_2d]
+    data = [historicals, actuals, forecasts_latest, forecasts_6h, forecasts_1d, forecasts_2d]
     fig = go.Figure(data=data, layout=layout)
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
