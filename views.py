@@ -35,7 +35,7 @@ def create_plot():
     x1 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=1))
           .order_by(Forecast.id)]
 
-    y1 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=1))
+    y1 = [x.drybulb for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=1))
           .order_by(Forecast.id)]  
         
     # retrieved on roughly this hour, 1d ago
@@ -44,7 +44,7 @@ def create_plot():
     x2 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=1),
         Forecast.retrieval_time < now - datetime.timedelta(minutes=1435)).order_by(Forecast.id)]
 
-    y2 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=1),
+    y2 = [x.drybulb for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=1),
         Forecast.retrieval_time < now - datetime.timedelta(minutes=1435)).order_by(Forecast.id)]
 
     # retrieved on roughly this hour, 2d ago
@@ -53,7 +53,7 @@ def create_plot():
     x3 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=2),
         Forecast.retrieval_time < now - datetime.timedelta(minutes=2875)).order_by(Forecast.id)]
 
-    y3 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=2),
+    y3 = [x.drybulb for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=2),
         Forecast.retrieval_time < now - datetime.timedelta(minutes=2875)).order_by(Forecast.id)]
 
     historicals = go.Scatter(
