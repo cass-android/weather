@@ -37,7 +37,14 @@ def create_plot():
           .order_by(Forecast.id)]
 
     y1 = [x.drybulb for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=1))
-          .order_by(Forecast.id)]  
+          .order_by(Forecast.id)]
+
+    # 6h   
+    x4 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=6),
+    	Forecast.retrieval_time < now - datetime.timedelta(minutes=355)).order_by(Forecast.id)]
+
+    y4 = [x.drybulb for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=6),
+    	Forecast.retrieval_time < now - datetime.timedelta(minutes=355)).order_by(Forecast.id)]
         
     # retrieved on roughly this hour, 1d ago
     # datetime greater than now minus 1d; less than five minutes after now minus 1d   
@@ -101,6 +108,14 @@ def create_plot():
                 width = 2,)
             )
 
+    forecasts_6h = go.Scatter(
+            x=x4,
+            y=y4,
+            name='forecasts_6h',
+            line=dict(
+                color = ('rgb(0,128,255)'),
+                width = 2,)
+            )
 
     layout = go.Layout(
     title=go.layout.Title(
@@ -130,7 +145,7 @@ def create_plot():
 
     
 
-    data = [historicals, actuals, forecasts_0d, forecasts_1d, forecasts_2d]
+    data = [historicals, actuals, forecasts_0d, forecasts_6h, forecasts_1d, forecasts_2d]
     fig = go.Figure(data=data, layout=layout)
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
