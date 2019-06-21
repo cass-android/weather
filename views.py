@@ -8,7 +8,8 @@ from models import Historical, Forecast, Station, Current
 import datetime
 
 import plotly
-import plotly.graph_objs as go 
+from plotly import graph_objs as go
+from plotly import plotly as py 
 
 import pandas as pd
 import numpy as np 
@@ -27,11 +28,11 @@ def create_plot():
     x00 = [x.id for x in Historical.query.filter(Historical.id >= now - datetime.timedelta(days=7)).order_by(Historical.id)]
     y00 = [x.drybulb for x in Historical.query.filter(Historical.id >= now - datetime.timedelta(days=7)).order_by(Historical.id)]
 
-    x0 = [x.id for x in Current.query.all()]
-    y0 = [x.drybulb for x in Current.query.all()]
+    # actuals
+    x0 = [x.id for x in Current.query.filter(Current.id >= now - datetime.timedelta(days=7)).order_by(Current.id)]
+    y0 = [x.drybulb for x in Current.query.filter(Current.id >= now - datetime.timedelta(days=7)).order_by(Current.id)]
 
-    # latest forecast (retrieved within the last hour)
-    
+    # latest forecast (retrieved within the last hour)   
     x1 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(hours=1))
           .order_by(Forecast.id)]
 
@@ -39,8 +40,7 @@ def create_plot():
           .order_by(Forecast.id)]  
         
     # retrieved on roughly this hour, 1d ago
-    # datetime greater than now minus 1d; less than five minutes after now minus 1d
-    
+    # datetime greater than now minus 1d; less than five minutes after now minus 1d   
     x2 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=1),
         Forecast.retrieval_time < now - datetime.timedelta(minutes=1435)).order_by(Forecast.id)]
 
@@ -48,8 +48,7 @@ def create_plot():
         Forecast.retrieval_time < now - datetime.timedelta(minutes=1435)).order_by(Forecast.id)]
 
     # retrieved on roughly this hour, 2d ago
-    # datetime greater than now minus 2d; less than five minutes after now minus 2d
-    
+    # datetime greater than now minus 2d; less than five minutes after now minus 2d   
     x3 = [x.id for x in Forecast.query.filter(Forecast.retrieval_time > now - datetime.timedelta(days=2),
         Forecast.retrieval_time < now - datetime.timedelta(minutes=2875)).order_by(Forecast.id)]
 
@@ -105,4 +104,34 @@ def create_plot():
     data = [historicals, actuals, forecasts_0d, forecasts_1d, forecasts_2d]
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
+    layout = go.Layout(
+    title=go.layout.Title(
+        text='Weather Forecast Accuracy Tracker',
+        xref='paper',
+        x=0
+    ),
+    xaxis=go.layout.XAxis(
+        title=go.layout.xaxis.Title(
+            text='Degrees C',
+            font=dict(
+                family='Helvetica, monospace',
+                size=18,
+                color='#7f7f7f'
+            )
+        )
+    ),
+    yaxis=go.layout.YAxis(
+        title=go.layout.yaxis.Title(
+            text='Date',
+            font=dict(
+                family='Helvetica, monospace',
+                size=18,
+                color='#7f7f7f'
+            )
+        )
+    )
+)
+    fig = go.Figure(data=data, layout=layout)
+
+#    return graphJSON
     return graphJSON
