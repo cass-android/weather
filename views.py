@@ -19,8 +19,8 @@ import json
 @app.route('/')
 def index():   
 
-    line = create_plot()
-    return render_template("index.html", plot=line)    
+    plot = create_plot()
+    return render_template("index.html", plot=plot)    
     
 def create_plot():
     N = 40
@@ -101,37 +101,36 @@ def create_plot():
                 width = 2,)
             )
 
-    data = [historicals, actuals, forecasts_0d, forecasts_1d, forecasts_2d]
-    graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
     layout = go.Layout(
     title=go.layout.Title(
-        text='Weather Forecast Accuracy Tracker',
+        text='Forecast Accuracy Tracker',
         xref='paper',
         x=0
     ),
     xaxis=go.layout.XAxis(
         title=go.layout.xaxis.Title(
-            text='Degrees C',
+            text='Date',
             font=dict(
                 family='Helvetica, monospace',
-                size=18,
-                color='#7f7f7f'
+                size=18
             )
         )
     ),
     yaxis=go.layout.YAxis(
         title=go.layout.yaxis.Title(
-            text='Date',
+            text='Degrees C',
             font=dict(
                 family='Helvetica, monospace',
-                size=18,
-                color='#7f7f7f'
-            )
-        )
-    )
-)
-    fig = go.Figure(data=data, layout=layout)
+                size=18
+	            )
+	        )
+	    )
+	)
 
-#    return graphJSON
+    
+
+    data = [historicals, actuals, forecasts_0d, forecasts_1d, forecasts_2d]
+    fig = go.Figure(data=data, layout=layout)
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
