@@ -89,7 +89,7 @@ def create_plot():
         y = [x.drybulb for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(minutes=60*n),
             Forecast.retrieval_time < now - datetime.timedelta(minutes=60*n-10)).order_by(Forecast.id)]
 
-            # Colour gradient
+        # Colour gradient
         c1='#3399FF' #more distant
         c2='#4C0099' #nearer
         mix=1-n/24
