@@ -65,7 +65,7 @@ def get_current():
     url = 'http://api.openweathermap.org/data/2.5/weather?id=6167865&APPID=631d59f50ab1841ba7af0f0f706e1505'
     r = requests.get(url, verify=True).json()
     if r:
-        row={'id': datetime.datetime.now(),
+        row={'id': datetime.datetime.now().replace(microsecond=0,second=0,minute=0),
              'drybulb':r['main']['temp']-272.15,
              'relative_humidity':r['main']['humidity']}
         return row
@@ -97,7 +97,7 @@ def get_forecasts():
         df=pd.DataFrame()
         for dt in r['list']:    
             row={'datetime':dt['dt_txt'],
-                 'retrieval_time':datetime.datetime.now(),
+                 'retrieval_time':datetime.datetime.now().replace(microsecond=0,second=0,minute=0),
                  'drybulb':dt['main']['temp']-273.15,
                  'relative_humidity':dt['main']['humidity']}
             # note: Kelvin to Celcius
