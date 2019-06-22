@@ -1,6 +1,7 @@
 """
 views imports app and models; these don't import views
 """
+# -*- coding: utf-8 -*-
 
 from flask import render_template, request
 from app import app
@@ -29,8 +30,13 @@ def colorFader(c1,c2,mix=0): #fade (linear interpolate) from color c1 (at mix=0)
     return mpl.colors.to_hex((1-mix)*c1 + mix*c2)
 
 def create_plot():
+    
+    # Variables
     N = 40
+    w=4
+    h=24
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
+    data=[]
 
     # Layout
     layout = go.Layout(
@@ -54,7 +60,7 @@ def create_plot():
 
     yaxis=go.layout.YAxis(
         title=go.layout.yaxis.Title(
-            text='Degrees C',
+            text='Temperature \u2103',
             font=dict(
                 family='Helvetica, monospace',
                 size=18
@@ -67,7 +73,7 @@ def create_plot():
     x0 = [x.id for x in Current.query.filter(Current.id >= now - datetime.timedelta(days=7)).order_by(Current.id)]
     y0 = [x.drybulb for x in Current.query.filter(Current.id >= now - datetime.timedelta(days=7)).order_by(Current.id)]
 
-    w=4
+
 
     actuals = go.Scatter(
         x=x0,
@@ -75,14 +81,14 @@ def create_plot():
         name='actual temperature',
         mode='lines',
         line=dict(
-            color = ('rgb(255,0,127)'),
+            color = ('#FF007F'),
             width = w)
         )   
 
-    data = [actuals]
+    data.append(actuals)
 
     # hourly for past n hours 
-    for n in range(1,24):
+    for n in range(1,h):
         x = [x.id for x in Forecast.query.filter(Forecast.retrieval_time >= now - datetime.timedelta(minutes=60*n),
             Forecast.retrieval_time < now - datetime.timedelta(minutes=60*n-10)).order_by(Forecast.id)]
 
@@ -91,21 +97,29 @@ def create_plot():
 
         # Colour gradient
         c1='#3399FF' #more distant
-        c2='#4C0099' #nearer
-        mix=1-n/24
+        c2='#990099' #nearer
+        mix=1-n/h
+
+        if n in (1, h-1):
+        	l= True
+        else: 
+        	l= False
 
         forecasts = go.Scatter(
                 x=x,
                 y=y,
-                name='forecasts_{}h'.format(n),
+                name='forecast {} h ago'.format(n),
                 line=dict(
                     color = (colorFader(c1,c2,mix)),
-                    width = w*(1/n)**(5/8)
-                    )
+                    width = w*(1/n)**(5/8),
+                    ),
+                showlegend=l,
                 )
         data.append(forecasts)
 
 
+
+    data=data[::-1]
     
     fig = go.Figure(data=data, layout=layout)
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
