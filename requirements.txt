@@ -69,7 +69,6 @@ tornado==6.0.2
 traitlets==4.3.2
 urllib3==1.25.3
 wcwidth==0.1.7
--e git+git@github.com:cass-android/weather.git@90441c72970f8ba998f58b6bbfbe924a228a32c6#egg=weather
 webencodings==0.5.1
 Werkzeug==0.15.2
 widgetsnbextension==3.4.2
