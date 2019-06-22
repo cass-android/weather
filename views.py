@@ -34,7 +34,7 @@ def create_plot():
     # Variables
     N = 40
     w=4
-    h=24
+    h=48
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
     data=[]
 
