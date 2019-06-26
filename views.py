@@ -37,6 +37,7 @@ def index():
     				timeframes=timeframes, 
     				plot=create_plot2(),
     				)
+		else return ""
 
 	except Exception as e:
 		return str(e)
