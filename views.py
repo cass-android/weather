@@ -115,7 +115,7 @@ def create_actuals(linewidth):
 def create_plot1():
     # Variables
     linewidth=4
-    h=24
+    h=48
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
 
     data=[create_actuals(linewidth)]
