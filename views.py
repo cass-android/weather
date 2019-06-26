@@ -42,7 +42,7 @@ def index():
 		 return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_plot1(),
+    				plot=create_plot3(),
     				)
 
 	except Exception as e:
