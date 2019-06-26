@@ -27,11 +27,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     <script type = text/javascript> 
 
-    if (typeof jQuery != 'undefined') {
-      // jQuery is loaded => print the version
-      alert(jQuery.fn.jquery);
-    }
-    
     $(document).ready(function(){
       var graphs = {{plot | safe}}
       Plotly.newPlot('linegraph', graphs)
@@ -50,11 +45,7 @@
         localStorage.setItem("timeframeValue", $(this).val());
       })
     })
-
-    if (typeof jQuery != 'undefined') {
-  // jQuery is loaded => print the version
-  alert(jQuery.fn.jquery);
-}
+    
     </script>
 
 </head>

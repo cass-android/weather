@@ -38,7 +38,11 @@ def index():
     				plot=create_plot2(),
     				)
 		else:
-		 return ""
+		 return render_template(
+    				'index.html', 
+    				timeframes=timeframes, 
+    				plot=create_plot1(),
+    				)
 
 	except Exception as e:
 		return str(e)
