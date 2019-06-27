@@ -28,21 +28,21 @@ def index():
 			return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_plot1(),
+    				plot=create_future(hoursBack=48,linewidth=4),
     				)
 		
 		elif option == 'Past':
 			return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_plot3(),
+    				plot=create_past(),
     				)
 
 		else:
 		 return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_plot3(),
+    				plot=create_future(hoursBack=144,linewidth=4),
     				)
 
 	except Exception as e:
@@ -78,17 +78,16 @@ def create_layout():
 
     return layout
 
-def create_actuals(linewidth, days):
+def create_actuals(linewidth, hoursBack):
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
     # actuals
     x0 = [x.id for x in Current.query.filter(
-    	Current.id >= now - datetime.timedelta(days=days)
+    	Current.id >= now - datetime.timedelta(hours=hoursBack)
     	).order_by(Current.id)]
 
     y0 = [x.drybulb for x in Current.query.filter(
-    	Current.id >= now - datetime.timedelta(days=days)
+    	Current.id >= now - datetime.timedelta(hours=hoursBack)
     	).order_by(Current.id)]
-
 
 
     actuals = go.Scatter(
@@ -103,30 +102,25 @@ def create_actuals(linewidth, days):
 
     return actuals	
 
-def create_plot1():
-    # Variables
-    linewidth=4
-    h=48
+def create_future(hoursBack=144,linewidth=4):
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
-
-    data=[create_actuals(linewidth, days=2)]
+    data=[create_actuals(linewidth=linewidth, hoursBack=hoursBack)]
 
     # hourly for past n hours 
-    for n in range(1,h):
-        x = [x.id for x in Forecast.query.filter(
+    for n in range(1,hoursBack):
+        query = Forecast.query.filter(
             Forecast.retrieval_time == now - datetime.timedelta(minutes=60*n)
-        ).order_by(Forecast.id)]
+        ).order_by(Forecast.id)
 
-        y = [x.drybulb for x in Forecast.query.filter(
-            Forecast.retrieval_time == now - datetime.timedelta(minutes=60*n)
-        ).order_by(Forecast.id)]
+        x = [x.id for x in query]
+        y = [x.drybulb for x in query]
 
         # Colour gradient
         c1='#FF0000' #more distant
         c2= '#000099'
-        mix=1-n/h
+        mix=1-n/hoursBack
 
-        if n in (1, h-1):
+        if n in (1, hoursBack-1):
         	l= True
         else: 
         	l= False
@@ -149,54 +143,11 @@ def create_plot1():
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
 
-def create_plot2():
-    # Variables
-    linewidth=4
-    d=4
-    now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
-
-    data=[create_actuals(linewidt, days=2)]
-
-    for n in range(0,d):
-        x2 = [x.id for x in Forecast.query.filter(
-            Forecast.retrieval_time == now - datetime.timedelta(days=n)
-        ).order_by(Forecast.id)]
-
-        y2 = [x.drybulb for x in Forecast.query.filter(
-            Forecast.retrieval_time == now - datetime.timedelta(days=n)
-        ).order_by(Forecast.id)]
-
-        # Colour gradient
-        c1='#FF0000' #more distant
-        c2= '#000099' #nearer
-        mix=1-(n+1)/d
-
-
-        forecastDay = go.Scatter(
-                x=x2,
-                y=y2,
-                name='{} d ago'.format(n),
-                line=dict(
-                    color = (colorFader(c1,c2,mix)),
-                    width = linewidth*(1/(n+1))**(5/8),
-                    ),
-                showlegend=True,
-                )
-
-        data.append(forecastDay)
-
-    fig = go.Figure(data=data, layout=create_layout())
-    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-    return graphJSON
-
-def create_plot3():
-
-    
-    d=4
+def create_past(linewidth=4, hoursBack=168, hoursForward = 12):
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)	
-    def generate_relative_sets(maxHoursOut=25):
-        linewidth=4
-        data=[create_actuals(linewidth, days=7)]
+
+    def generate_relative_sets(maxHoursOut=25):       
+        data=[create_actuals(linewidth=linewidth, hoursBack=hoursBack)]
 
         for hoursOut in range (1,maxHoursOut):  
 
@@ -225,17 +176,15 @@ def create_plot3():
         
         return data
 
-    def relative_set(hoursOut, hoursBack = 144):
-        
-        x = [x.id for x in Forecast.query.filter(
+    def relative_set(hoursOut, hoursBack = hoursBack, hoursForward = hoursForward):       
+        query = Forecast.query.filter(
             Forecast.id >= now - datetime.timedelta(hours=hoursBack),
+            Forecast.id <= now + datetime.timedelta(hours=hoursForward),
             Forecast.retrieval_time == Forecast.id - datetime.timedelta(hours=hoursOut)            
-        ).order_by(Forecast.id)]
+        ).order_by(Forecast.id)
 
-        y = [x.drybulb for x in Forecast.query.filter(
-            Forecast.id >= now - datetime.timedelta(hours=hoursBack),
-            Forecast.retrieval_time == Forecast.id - datetime.timedelta(hours=hoursOut)
-        ).order_by(Forecast.id)]
+        x = [x.id for x in query]
+        y = [x.drybulb for x in query]
 
         return x,y
 
