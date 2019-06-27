@@ -17,6 +17,11 @@ import numpy as np
 import json
 
 
+@app.route('/project', methods=['GET'])
+def project():
+    return render_template('project.html')
+
+
 @app.route('/', methods=['GET'])
 
 def index():
@@ -42,7 +47,7 @@ def index():
 		 return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_future(hoursBack=144,linewidth=4),
+    				plot=create_future(hoursBack=12,linewidth=4),
     				)
 
 	except Exception as e:
@@ -57,14 +62,6 @@ def create_layout():
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
 
     layout = go.Layout(
-    title=go.layout.Title(
-        text='Weather Forecast Tracker',
-            font=dict(
-                family='Helvetica, monospace',
-                size=20
-	            )
-    ),
-
     yaxis=go.layout.YAxis(
         title=go.layout.yaxis.Title(
             text='Temperature \u2103',
@@ -74,6 +71,13 @@ def create_layout():
 	            )
 	        )
 	    ),
+    margin=go.layout.Margin(
+        l=50,
+        r=50,
+        b=50,
+        t=50,
+        pad=4
+        ),
 	)
 
     return layout
@@ -102,7 +106,7 @@ def create_actuals(linewidth, hoursBack):
 
     return actuals	
 
-def create_future(hoursBack=144,linewidth=4):
+def create_future(hoursBack, linewidth=4):
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
     data=[create_actuals(linewidth=linewidth, hoursBack=hoursBack)]
 

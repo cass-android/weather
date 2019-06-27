@@ -3,79 +3,91 @@
 
 
 <head lang="en">
-    <meta charset="UTF-8">
-    <title>Weather Dashboard</title>
-    <style>
-    .grid-container {
-      display: grid;
-      grid-template-columns: auto;
-      grid-template-rows: 500px 500px;
-      grid-gap: 10px;
-      background-color: #FFFFFF;
-      padding: 10px;
-    }
+<meta charset="UTF-8">
+<title>Weather Dashboard</title>
+<style>
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-    .grid-container > div {
-      background-color: rgba(255, 255, 255, 0.8);
-      text-align: center;
-      padding: 20px 0;
-      font-size: 30px;
-    }
-    </style>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-    <script type = text/javascript> 
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-    $(document).ready(function(){
-      var graphs = {{plot | safe}};
-      var timeframeValue = "All"
-      Plotly.newPlot('linegraph', graphs)
-      $("select").change(function(){
-         Plotly.newPlot('linegraph', graphs)
-      });      
-    });
+.header{
+  background-color: #FFFFFF;
+  margin: 0px 25px 0px 40px;
+  overflow: hidden;
+  height: 5%;
+}
 
-    $(function(){
-      var timeframeValue = localStorage.getItem("timeframeValue");
-      if(timeframeValue != null) {
-        $("select[name=timeframes]").val(timeframeValue);
-      }
+.chart{
+  background-color: #FFFFFF;
 
-      $("select[name=timeframes]").on("change", function(){
-        localStorage.setItem("timeframeValue", $(this).val());
-      })
-    })
+}
+.paragraph{
+  background-color: #f1f1f1;
+  font-size: 20px;
+  margin: 0px 175px 0px 100px;
+}
+a:link, a:visited{
+  float: right;
+  font-size: 20px;
+  display: inline-block;
+  margin: 0px 0px 10px 0px;
 
-    </script>
+}
 
+</style>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<script type = text/javascript> 
+
+$(document).ready(function(){
+  var graphs = {{plot | safe}};
+  var timeframeValue = "All"
+  Plotly.newPlot('linegraph', graphs)
+  $("select").change(function(){
+     Plotly.newPlot('linegraph', graphs)
+  });      
+});
+
+$(function(){
+  var timeframeValue = localStorage.getItem("timeframeValue");
+  if(timeframeValue != null) {
+    $("select[name=timeframes]").val(timeframeValue);
+  }
+
+  $("select[name=timeframes]").on("change", function(){
+    localStorage.setItem("timeframeValue", $(this).val());
+  })
+})
+
+</script>
 </head>
-
 <body>
-
-<div class='container'>
-
-<form action = "/" method = "GET">
-
-  <select name= timeframes onchange="this.form.submit()">
-      <option value= "All" SELECTED >All</option>
-      <option value= "Future" >Future</option>
-      <option value= "Past" >Past</option>
-  </select>
-
-</form>
-
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="chart" id="linegraph">  
-            </div>
-        </div>
-    </div>
+<div class="header">
+  <p style="font-size:25px;text-align: center;">Weather Forecast Tracker</p>  
+  <a href="project">Project Description</a>
+  <form action = "/" method = "GET">
+    <select name= timeframes onchange="this.form.submit()">
+        <option value= "All" SELECTED >All</option>
+        <option value= "Future" >Future</option>
+        <option value= "Past" >Past</option>
+    </select>
+  </form>
 </div>
-
-
-
+<div class="chart">
+  <div class="chart" id="linegraph">  
+  </div>  
+</div>
+<div class="paragraph">
+  <p>This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.
+  </p>  
+</div>
 </body>
 </html>
 
