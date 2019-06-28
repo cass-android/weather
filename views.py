@@ -33,7 +33,7 @@ def index():
 			return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_future(hoursBack=48,linewidth=4),
+    				plot=create_future(hoursBack=12,linewidth=4),
     				)
 		
 		elif option == 'Past':
@@ -42,12 +42,17 @@ def index():
     				timeframes=timeframes, 
     				plot=create_past(),
     				)
-
+		elif option == 'All':
+		    return render_template(
+				    'index.html', 
+				    timeframes=timeframes, 
+				    plot=create_future(hoursBack=96,linewidth=4),
+				    )
 		else:
 		 return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_future(hoursBack=12,linewidth=4),
+    				plot=create_past(),
     				)
 
 	except Exception as e:
@@ -113,7 +118,7 @@ def create_future(hoursBack, linewidth=4):
     # hourly for past n hours 
     for n in range(1,hoursBack):
         query = Forecast.query.filter(
-            Forecast.retrieval_time == now - datetime.timedelta(minutes=60*n)
+            Forecast.retrieval_time == now - datetime.timedelta(hours=n)
         ).order_by(Forecast.id)
 
         x = [x.id for x in query]
@@ -124,7 +129,7 @@ def create_future(hoursBack, linewidth=4):
         c2= '#000099'
         mix=1-n/hoursBack
 
-        if n in (1, hoursBack-1):
+        if n in (1, 6, 12, 18, hoursBack-1):
         	l= True
         else: 
         	l= False
@@ -132,7 +137,7 @@ def create_future(hoursBack, linewidth=4):
         forecastHour = go.Scatter(
                 x=x,
                 y=y,
-                name='{} h ago forecast'.format(n),
+                name='forecast {} h ago '.format(n),
                 line=dict(
                     color = (colorFader(c1,c2,mix)),
                     width = linewidth*(1/n)**(5/8),
