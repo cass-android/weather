@@ -28,12 +28,12 @@ body {
 
 }
 .paragraph{
-  background-color: #f1f1f1;
+  background-color: #FFFFFF;
   font-size: 20px;
   margin: 0px 175px 0px 100px;
 }
 a:link, a:visited{
-  float: right;
+  
   font-size: 20px;
   display: inline-block;
   margin: 0px 0px 10px 0px;
@@ -70,23 +70,29 @@ $(function(){
 </head>
 <body>
 <div class="header">
-  <p style="font-size:25px;text-align: center;">Weather Forecast Tracker</p>  
-  <a href="project">Project Description</a>
-  <form action = "/" method = "GET">
+  <p style="font-size:25px;text-align: center;margin: 10px 0px 0px 0px;">Weather Forecast Tracker</p>  
+  <p style="font-size:20px;text-align: center;margin: 10px 0px 0px 0px;">Data Source: <a href="https://openweathermap.org/api"target="_blank">openweathermap.org </a></p>
+  <a href="project" style="float: right;margin: -28px 0px 0px 0px;">Project Description</a>
+  <form action = "/" method = "GET"style="float: left;margin: -28px 0px 0px 0px;">
     <select name= timeframes onchange="this.form.submit()">
         <option value= "All" SELECTED >All</option>
         <option value= "Future" >Future</option>
         <option value= "Past" >Past</option>
     </select>
   </form>
+
 </div>
+
 <div class="chart">
-  <div class="chart" id="linegraph">  
+  <div class="chart" id="linegraph" style="margin: 0px 0px 0px 10px;">  
   </div>  
 </div>
 <div class="paragraph">
-  <p>This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.This is a paragraph.
-  </p>  
+  <p> Database is updated hourly with current weather conditons and a forecast for the next five days. Each forecast is plotted alongside the actual weather, to visualize how the forecast changes as it gets nearer in time. </p>
+
+  <p> The time delay bewteen the forecast and actual temperature makes me suspect that OpenWeatherMap might be using a <a href="https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/"target="_blank">persistence model</a>, basically just predicting the temperature an hour from now using the temperature right now. Although this kind of model can appear very accurate using common metrics like mean percentage error and R2, it has very little actual predictive power. See: <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank">How (not)to use Machine Learning for time series forecasting</a> </p>
+
+  <p> Looking at the further-away forecasts (in red), they appear to predict, generally, days that will be cooler or hotter. </p> 
 </div>
 </body>
 </html>

@@ -25,10 +25,10 @@
   <h2> Overview </h2>
 
   <h2> Flask vs Django </h2>
-  <p>Flask and Django are both frameworks for web applications in Python. The big difference between them is that Django generates a default directory structure and contains a lot of utilities out of the box. Flask leaves this all up to the developer. Since my main goal for this project was learning the basics, I opted for the more minimalist Flask (side note: some people think we <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"> shouldn't start learning with a framework</a>
+  <p>Flask and Django are both frameworks for web applications in Python. The big difference between them is that Django generates a default directory structure and contains a lot of utilities out of the box. Flask leaves this all up to the developer. Since my main goal for this project was learning the basics, I opted for the more minimalist Flask (side note: some people think we <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank"> shouldn't start learning with a framework</a>
 
   <h2>Structuring a Flask App</h2>
-  <p>A Flask application can be anything from a single module (usually app.py), to a larger package that looks similar to Django. Larger packages can also be factored into a set of <a href="http://flask.pocoo.org/docs/0.12/blueprints/#blueprints">blueprints</a>, objects that construct components with common patterns. Since I’m new at this I decided to keep it simple, and landed on the following structure:</p>
+  <p>A Flask application can be anything from a single module (usually app.py), to a larger package that looks similar to Django. Larger packages can also be factored into a set of <a href="http://flask.pocoo.org/docs/0.12/blueprints/#blueprints"target="_blank">blueprints</a>, objects that construct components with common patterns. Since I’m new at this I decided to keep it simple, and landed on the following structure:</p>
   <ul>
   	<li><b>app.py</b> the module that contains the Flask instance and the database. I kind of think of this as the brain stem, while main.py is the actual spark of consciousness. </li>
   	<li><b>main.py</b> basically the ‘on’ switch that imports everything. A lot of tutorials out there seem to do this all in app.py, but since app.py is also imported by a lot of things, circularity problems can abound</li>
