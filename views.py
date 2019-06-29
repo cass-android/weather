@@ -165,8 +165,8 @@ def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOu
     for hour in hourWindow:
 
         # Colour gradient
-        c1='#FF0000' #more distant
-        c2= '#000099'
+        c1= '#000099' #more distant
+        c2= '#FF0000'
         mix=1-hour/maxHoursOut
 
         # Hover label settings
