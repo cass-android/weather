@@ -71,16 +71,15 @@ $(function(){
 <body>
 <div class="header">
   <p style="font-size:25px;text-align: center;margin: 10px 0px 0px 0px;">Weather Forecast Tracker</p>  
-  <p style="font-size:20px;text-align: center;margin: 10px 0px 0px 0px;">Data Source: <a href="https://openweathermap.org/api"target="_blank">openweathermap.org </a></p>
+  <p style="font-size:20px;text-align: center;margin: 10px 0px 0px 0px;">Data from <a href="https://openweathermap.org/api"target="_blank">openweathermap.org </a> for Toronto, ON</p>
   <a href="project" style="float: right;margin: -28px 0px 0px 0px;">Project Description</a>
   <form action = "/" method = "GET"style="float: left;margin: -28px 0px 0px 0px;">
     <select name= timeframes onchange="this.form.submit()">
-        <option value= "All" SELECTED >All</option>
-        <option value= "Future" >Future</option>
         <option value= "Past" >Past</option>
+        <option value= "Future" >Future</option>
+        <option value= "All" SELECTED >All</option>
     </select>
   </form>
-
 </div>
 
 <div class="chart">
@@ -88,11 +87,12 @@ $(function(){
   </div>  
 </div>
 <div class="paragraph">
-  <p> Database is updated hourly with current weather conditons and a forecast for the next five days. Each forecast is plotted alongside the actual weather, to visualize how the forecast changes as it gets nearer in time. </p>
+  <p> The goal of this project was to visualize updates to a frequently-changing forecast. The redder lines show predictions made further back in time for the same time period. More detailed views can be seen by chaning the time period (top left).</p>
 
-  <p> The time delay bewteen the forecast and actual temperature makes me suspect that OpenWeatherMap might be using a <a href="https://machinelearningmastery.com/persistence-time-series-forecasting-with-python/"target="_blank">persistence model</a>, basically just predicting the temperature an hour from now using the temperature right now. Although this kind of model can appear very accurate using common metrics like mean percentage error and R2, it has very little actual predictive power. See: <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank">How (not)to use Machine Learning for time series forecasting</a> </p>
+  <p>Our database is updated hourly using the free OpenWeatherMap API. This gives us the current weather conditions along with a five-day forecast. </p>
 
-  <p> Looking at the further-away forecasts (in red), they appear to predict, generally, days that will be cooler or hotter. </p> 
+  <p>One observation is that the forecast values all seem to lag the actual temperature changes. It is unclear whether this is an artifact, or indicative of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a> being used, or caused by something else. Data will be archived for analysis. </p>
+
 </div>
 </body>
 </html>

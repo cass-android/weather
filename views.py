@@ -4,7 +4,8 @@ views imports app and models; these don't import views
 # -*- coding: utf-8 -*-
 
 from flask import render_template, request
-from app import app
+from sqlalchemy.sql.expression import func
+from app import app, db
 from models import Historical, Forecast, Station, Current
 import datetime
 import plotly
@@ -23,9 +24,8 @@ def project():
 
 
 @app.route('/', methods=['GET'])
-
 def index():
-	timeframes = ['Hours', 'Days']	
+	timeframes = []	
 	try:
 		option = request.args.get("timeframes", type=str)
 
@@ -33,26 +33,25 @@ def index():
 			return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_future(hoursBack=12,linewidth=4),
-    				)
-		
+    				plot=create_plot(skip=3, linewidth=4, hoursBack=12, hoursForward=120, maxHoursOut=121)
+    				)	
 		elif option == 'Past':
 			return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_past(),
+    				plot=create_plot(skip=3, linewidth=4, hoursBack=144, hoursForward=0, maxHoursOut=96),
     				)
 		elif option == 'All':
 		    return render_template(
 				    'index.html', 
 				    timeframes=timeframes, 
-				    plot=create_future(hoursBack=96,linewidth=4),
+				    plot=create_plot(skip=3, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
 				    )
 		else:
 		 return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_past(),
+    				plot=create_plot(skip=3, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
     				)
 
 	except Exception as e:
@@ -87,7 +86,26 @@ def create_layout():
 
     return layout
 
-def create_actuals(linewidth, hoursBack):
+def create_now():
+	now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
+	x = [now, now]
+	y = [0, 30]
+
+	nowtrace = go.Scatter(
+		x=x,
+		y=y,
+		name='current time',
+		mode='lines',
+		showlegend=False,
+		line=dict(
+			color =('#EFB805'),
+			width = 4)
+		)
+
+	return nowtrace
+
+
+def create_actuals(linewidth, hoursBack, showlegend=False):
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
     # actuals
     x0 = [x.id for x in Current.query.filter(
@@ -104,100 +122,86 @@ def create_actuals(linewidth, hoursBack):
         y=y0,
         name='actual temperature',
         mode='lines',
+        showlegend=showlegend,
         line=dict(
-            color = ('#696969'),
-            width = linewidth)
+            color = ('#c0c0c0'),
+            width = 4)
         )  
 
-    return actuals	
+    return actuals
 
-def create_future(hoursBack, linewidth=4):
+def create_latest_forecast(hoursBack, hoursForward, linewidth=3):
+# Creates trace for most recent forecast only; currently not used
+
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
-    data=[create_actuals(linewidth=linewidth, hoursBack=hoursBack)]
+    query = Forecast.query.filter(
+        Forecast.id >= now - datetime.timedelta(hours=hoursBack),
+        Forecast.id <= now + datetime.timedelta(hours=hoursForward),
+        Forecast.retrieval_time == db.session.query(func.max(Forecast.retrieval_time))[0]            
+    ).order_by(Forecast.id)
 
-    # hourly for past n hours 
-    for n in range(1,hoursBack):
-        query = Forecast.query.filter(
-            Forecast.retrieval_time == now - datetime.timedelta(hours=n)
-        ).order_by(Forecast.id)
 
-        x = [x.id for x in query]
-        y = [x.drybulb for x in query]
+    latest = go.Scatter(
+        x = [x.id for x in query],
+        y = [x.drybulb for x in query],
+        name='latest forecast',
+        mode='lines',
+        line=dict(
+            color = '#000000',
+            width = linewidth,
+            ),
+        hoverinfo='x+y+name',
+        showlegend=True
+        )
+
+    return latest
+
+
+def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOut=192):
+    data=[create_actuals(linewidth=linewidth, hoursBack=hoursBack), create_now()]
+    hourWindow=range(1,maxHoursOut)[::skip]
+    
+
+    for hour in hourWindow:
 
         # Colour gradient
         c1='#FF0000' #more distant
         c2= '#000099'
-        mix=1-n/hoursBack
+        mix=1-hour/maxHoursOut
 
-        if n in (1, 6, 12, 18, hoursBack-1):
-        	l= True
-        else: 
-        	l= False
+        # Hover label settings
+        if hour == hourWindow[::]:
+            hover = 'x+y+name'
+        else:
+            hover = 'none'
 
-        forecastHour = go.Scatter(
-                x=x,
-                y=y,
-                name='forecast {} h ago '.format(n),
-                line=dict(
-                    color = (colorFader(c1,c2,mix)),
-                    width = linewidth*(1/n)**(5/8),
-                    ),
-                showlegend=l
-                )
-
-        data.append(forecastHour)
-
+        rel_set = go.Scatter(
+            x=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[0],
+            y=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[1],
+            name='forecast {} h out'.format(hour),
+            mode='lines',
+            line=dict(
+                color = (colorFader(c1,c2,mix)),
+                width = (linewidth*1.5)*(1/hour)**(6/8),
+                ),
+            hoverinfo=hover,
+            showlegend=True
+            )
+        data.append(rel_set)
     
     fig = go.Figure(data=data, layout=create_layout())
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
 
-def create_past(linewidth=4, hoursBack=168, hoursForward = 12):
-    now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)	
+def relative_set(hoursOut, hoursBack, hoursForward):
+    now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)       
+    query = Forecast.query.filter(
+        Forecast.id >= now - datetime.timedelta(hours=hoursBack),
+        Forecast.id <= now + datetime.timedelta(hours=hoursForward),
+        Forecast.retrieval_time == Forecast.id - datetime.timedelta(hours=hoursOut)            
+    ).order_by(Forecast.id)
 
-    def generate_relative_sets(maxHoursOut=25):       
-        data=[create_actuals(linewidth=linewidth, hoursBack=hoursBack)]
+    x = [x.id for x in query]
+    y = [x.drybulb for x in query]
 
-        for hoursOut in range (1,maxHoursOut):  
-
-            # Colour gradient
-            c1='#FF0000' #more distant
-            c2= '#000099'
-            mix=1-hoursOut /maxHoursOut
-
-            # Legend visibility
-            if hoursOut in (1, 6, 12, 18, maxHoursOut-1):
-        	    l= True
-            else: 
-        	    l= False
-
-            rel_set = go.Scatter(
-                x=relative_set(hoursOut)[0],
-                y=relative_set(hoursOut)[1],
-                name='forecast {} h out'.format(hoursOut),
-                line=dict(
-                    color = (colorFader(c1,c2,mix)),
-                    width = linewidth*(1/hoursOut)**(5/8),
-                    ),
-                showlegend=l
-                )
-            data.append(rel_set)
-        
-        return data
-
-    def relative_set(hoursOut, hoursBack = hoursBack, hoursForward = hoursForward):       
-        query = Forecast.query.filter(
-            Forecast.id >= now - datetime.timedelta(hours=hoursBack),
-            Forecast.id <= now + datetime.timedelta(hours=hoursForward),
-            Forecast.retrieval_time == Forecast.id - datetime.timedelta(hours=hoursOut)            
-        ).order_by(Forecast.id)
-
-        x = [x.id for x in query]
-        y = [x.drybulb for x in query]
-
-        return x,y
-
-    data = generate_relative_sets()
-    fig = go.Figure(data=data, layout=create_layout())
-    graphJSON2 = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-    return graphJSON2
+    return x,y
