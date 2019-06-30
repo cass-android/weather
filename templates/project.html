@@ -13,36 +13,62 @@
   overflow: hidden;
   height: 5%;
 }
+ul li{ 
+  margin-bottom: 10px; 
+}
+body{
+  margin-left: 100px;
+  margin-right: 100px;
+
+}
+p {
+  text-align: justify;
+}
+
 </style>
 </head>
 <body>
   
 <div class="Header">
-  <h1> What I learned from this project</h1>
+  <h1> Building a Data-Driven App with Flask and Postgres </h1>
   <a href="/"style="float:right">Back to Main Page</a>
-</div>
+</div> 
 
   <h2> Overview </h2>
+  <p> Apart from reinforcing the known fact that weather forecasts are not very reliable, the secondary goal of this project was to demonstrate a simple web application that can query an API, interact with a database through an ORM, and display up-to-date information.</p>
 
-  <h2> Flask vs Django </h2>
-  <p>Flask and Django are both frameworks for web applications in Python. The big difference between them is that Django generates a default directory structure and contains a lot of utilities out of the box. Flask leaves this all up to the developer. Since my main goal for this project was learning the basics, I opted for the more minimalist Flask (side note: some people think we <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank"> shouldn't start learning with a framework</a>
 
-  <h2>Structuring a Flask App</h2>
-  <p>A Flask application can be anything from a single module (usually app.py), to a larger package that looks similar to Django. Larger packages can also be factored into a set of <a href="http://flask.pocoo.org/docs/0.12/blueprints/#blueprints"target="_blank">blueprints</a>, objects that construct components with common patterns. Since I’m new at this I decided to keep it simple, and landed on the following structure:</p>
+  <h2> Frameworks and Decisions </h2>
+  <p> Although <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank"> there will always be naysayers, </a> choosing a framework is generally a good first step. Since this project had its origins in Python, I looked to Flask and Django (the best-known Python frameworks). Django can quickly generate a robust application with many utilities out of the box. Flask is a lot more minimalist and open-ended, leaving it up to the developer to structure the app and include additional packages as needed. I opted for Flask since many of the Django features seemed like overkill here. </p>
+
+  <p> As a site note, many other (potentially more powerful) Python frameworks abound. Applications making use of asyncio, for example, would have to go beyond what Flask or Django can offer. However, both Flask and Django have been around a while and have plentiful support and documentation. Another contender for this kind of app is  <a href='https://plot.ly/products/dash/'> Plotly Dash </a>, which can create interactive dashboards without any javascript. I used the Plotly library within my Flask app just to create the graph, but alongside html/css/javascript for more control and flexibility on the front end. </p>
+
+  <h2>File Structure</h2>
+  <p>Flask is structure-neutral, meaning that apps can be anything from a single module to a large package. After a minor amount of confusion and restructuring, dividing my code into the following files seemed to work best: </p>
+
   <ul>
-  	<li><b>app.py</b> the module that contains the Flask instance and the database. I kind of think of this as the brain stem, while main.py is the actual spark of consciousness. </li>
-  	<li><b>main.py</b> basically the ‘on’ switch that imports everything. A lot of tutorials out there seem to do this all in app.py, but since app.py is also imported by a lot of things, circularity problems can abound</li>
-  	<li><b>models.py</b> where the database models live </li>
-  	<li><b>config.py</b> configures variables for different deployment environments. Mostly for practice, I created separate development, staging and production environments. I also created a couple of environment variables (database URI and app secret key) that this file pulls from the os. This makes it easier to move to a cloud-hosted database
-  	<li><b>index.html</b> the template that gets rendered by the function in the views module. I'm using the Plotly package, and sending it a JSON that contains the data and formatting for each trace. </li>
-  	<li><b>manage.py</b> configures app and create database migrations</li>
+  	<li><b>main.py: </b> basically the ‘on’ switch that launches the app. A lot of examples I looked at included this within the app.py file. This was causing circularity problems for me, since app.py is imported by a number of other modules. The best solution seemed to be including it in a separate file. </li>
+
+  	<li><b>app.py: </b> the module that contains the Flask instance and the database. I started thinking of this as the brain stem of the app, while main.py is the actual spark of consciousness. </li>
+
+  	<li><b>models.py: </b> where the data models live. Here we define classes that create model objects representing the tables in our relational database. We can then interact with our database through these model objects. Models are created as children of the Model class in the Flask-SQLAlchemy extension. </li>
+
+  	<li><b>config.py: </b> configures environment variables for deployment. This is determined by another variable, 'APP SETTINGS', that pulls the database URI and secret key from the os. This will be important when deploying to the cloud. The config file also sets some variables separately for development, staging and production environments -- probably overkill here, but nice to be aware of. 
+
+  	<li> 
+
+  	<li><b>templates (index.html, etc.): </b> the files that get rendered by the view function when a GET or POST request is recieved. The view passes the graph data/formatting to Plotly as a JSON. I added a drop-down that renders the index template with a different plot based on the selected value. Since my formatting is relatively basic, I included the CSS within my html headers rather than creating a separate style sheet. </li>
+
+  	<li><b>manage.py: </b> configures app, creates and runs migration files (what you use when you need to make changes to your database)</li>
   </ul>
 
-  <h2>Updating Database from the the OpenWeatherMap API</h2>
+  <h2>Interacting with the Database</h2>
 
-  <h2>Using the SQLAlchemy ORM</h2>
+  <p> The dashboard uses tables for current and forecast weather conditions that are each indexed by a datetime column. The Forecasts table has an additional 'retrieval time' column as part of the primary key, which allows me to calculate the difference between the time a forecast is for (the id), and when it was downloaded. </p>
+ 
+  <h2>Deployment</h2>
 
-  <h2>Deploying to Heroku</h2>
+  <h2>Scheduling Updates</h2>
 
 
   <p><b>

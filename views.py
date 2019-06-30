@@ -6,7 +6,7 @@ views imports app and models; these don't import views
 from flask import render_template, request
 from sqlalchemy.sql.expression import func
 from app import app, db
-from models import Historical, Forecast, Station, Current
+from models import Forecast, Current
 import datetime
 import plotly
 from plotly import graph_objs as go
@@ -27,7 +27,7 @@ def project():
 def index():
 	timeframes = []	
 	try:
-		option = request.args.get("timeframes", type=str)
+		option = request.args.get("timeframes", type=str) # gets the value of 'timeframes' (the submitted form that makes the request)
 
 		if option == 'Future':
 			return render_template(
@@ -39,19 +39,19 @@ def index():
 			return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_plot(skip=3, linewidth=4, hoursBack=144, hoursForward=0, maxHoursOut=96),
+    				plot=create_plot(skip=3, linewidth=4, hoursBack=144, hoursForward=0, maxHoursOut=121),
     				)
 		elif option == 'All':
 		    return render_template(
 				    'index.html', 
 				    timeframes=timeframes, 
-				    plot=create_plot(skip=3, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
+				    plot=create_plot(skip=4, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
 				    )
 		else:
 		 return render_template(
     				'index.html', 
     				timeframes=timeframes, 
-    				plot=create_plot(skip=3, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
+    				plot=create_plot(skip=4, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
     				)
 
 	except Exception as e:
@@ -82,6 +82,7 @@ def create_layout():
         t=50,
         pad=4
         ),
+    hovermode = 'closest'
 	)
 
     return layout
@@ -150,7 +151,7 @@ def create_latest_forecast(hoursBack, hoursForward, linewidth=3):
             color = '#000000',
             width = linewidth,
             ),
-        hoverinfo='x+y+name',
+        hoverinfo='x+y',
         showlegend=True
         )
 
@@ -167,13 +168,9 @@ def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOu
         # Colour gradient
         c1= '#000099' #more distant
         c2= '#FF0000'
-        mix=1-hour/maxHoursOut
 
-        # Hover label settings
-        if hour == hourWindow[::]:
-            hover = 'x+y+name'
-        else:
-            hover = 'none'
+        # crimson '#DC143C'
+        mix=1-hour/maxHoursOut
 
         rel_set = go.Scatter(
             x=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[0],
@@ -184,7 +181,7 @@ def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOu
                 color = (colorFader(c1,c2,mix)),
                 width = (linewidth*1.5)*(1/hour)**(6/8),
                 ),
-            hoverinfo=hover,
+            hoverinfo='x+y',
             showlegend=True
             )
         data.append(rel_set)
