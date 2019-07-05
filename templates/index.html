@@ -48,7 +48,6 @@ a:link, a:visited{
 
 $(document).ready(function(){
   var graphs = {{plot | safe}};
-  var timeframeValue = "All"
   Plotly.newPlot('linegraph', graphs)
   $("select").change(function(){
      Plotly.newPlot('linegraph', graphs)
@@ -56,13 +55,13 @@ $(document).ready(function(){
 });
 
 $(function(){
-  var timeframeValue = localStorage.getItem("timeframeValue");
+  var timeframeValue = sessionStorage.getItem("timeframeValue");
   if(timeframeValue != null) {
     $("select[name=timeframes]").val(timeframeValue);
   }
 
   $("select[name=timeframes]").on("change", function(){
-    localStorage.setItem("timeframeValue", $(this).val());
+    sessionStorage.setItem("timeframeValue", $(this).val());
   })
 })
 
@@ -88,9 +87,9 @@ $(function(){
 </div>
 <div class="paragraph">
   <p> The goal of this project was to visualize the magintude of updates to a frequently-changing forecast.
- Current weather conditions and a five-day forecast are retrieved hourly, using the free OpenWeatherMap API, and stored. Forecasts are plotted and colorized, with bluer lines show predictions made further back in time. </p>
+ Current weather conditions and a five-day forecast are retrieved hourly. Forecasts are plotted and colorized, with bluer lines show predictions made further back in time. </p>
 
-  <p>One observation is that the forecast values all seem to lag the actual temperature changes. It is unclear whether this is an artifact, or indicative of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a> being used, or some other cause. Data will be archived for further analysis. </p>
+  <p>We can clearly see that the forecast values all seem to lag the actual temperature changes. It is unclear whether this is an artifact, or indicative of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a>, or whether we've just been having unusually warm mornings. </p>
 
 </div>
 </body>

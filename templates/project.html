@@ -35,13 +35,20 @@ p {
 </div> 
 
   <h2> Overview </h2>
-  <p> Apart from reinforcing the known fact that weather forecasts are not very reliable, the secondary goal of this project was to demonstrate a simple web application that can query an API, interact with a database through an ORM, and display up-to-date information.</p>
+  <p> Apart from reinforcing the known fact that weather forecasts are not very reliable, the goal of this project was to demonstrate a simple cloud-hosted application that can query an API, interact with a database through an ORM, and can display up-to-date information. It was primarily a learning exercise, aimed at getting past that initial hurdle of figuring out how all the pieces fit together.</p>
+
+  <h2>Project Scope</h2>
+  The project had its origins in other work involving weather data (e.g archiving bulk historical data from <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"> the Government of Canada</a>). My data model quickly narrowed down from 'all the weather everywhere' to just the Toronto temperature forecasts and recent actuals. I wanted to build something with some back-end automation and a cool dashboard. So I followed a question that was interesting to me, to what extent and how often does the weather forecast change. Maybe not rocket science, but an intuitive way to visualize the actual predictive power of any  time-series forecast that is purported to be highly accurate. <p>
 
 
   <h2> Frameworks and Decisions </h2>
-  <p> Although <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank"> there will always be naysayers, </a> choosing a framework is generally a good first step. Since this project had its origins in Python, I looked to Flask and Django (the best-known Python frameworks). Django can quickly generate a robust application with many utilities out of the box. Flask is a lot more minimalist and open-ended, leaving it up to the developer to structure the app and include additional packages as needed. I opted for Flask since many of the Django features seemed like overkill here. </p>
+  <p> Although <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank"> there will always be naysayers, </a> a framework is generally a good starting point for building a web app. Since I alread had some work done in Python, I looked to Flask and Django (the best-known Python frameworks). Django can quickly generate a robust application with many utilities out of the box. Flask is much more minimalist and open-ended, leaving it up to the developer to structure the app and include additional packages as needed. I opted for Flask since Django seemed like overkill. </p>
 
-  <p> As a site note, many other (potentially more powerful) Python frameworks abound. Applications making use of asyncio, for example, would have to go beyond what Flask or Django can offer. However, both Flask and Django have been around a while and have plentiful support and documentation. Another contender for this kind of app is  <a href='https://plot.ly/products/dash/'> Plotly Dash </a>, which can create interactive dashboards without any javascript. I used the Plotly library within my Flask app just to create the graph, but alongside html/css/javascript for more control and flexibility on the front end. </p>
+  <p> As a site note, other (and potentially more powerful) Python frameworks abound. Applications making use of<a href= "https://hackernoon.com/a-simple-introduction-to-pythons-asyncio-595d9c9ecf8c"target="_blank">asyncio</a>, for example, would have to go beyond what Flask or Django can offer. However, both Flask and Django have been around a while and have plentiful support and documentation. Specific to analytic apps, <a href='https://plot.ly/products/dash/'target="_blank"> Plotly Dash </a> is a framework that minimizes the need for javascript. I used the Plotly library within my Flask app to create the plot itself, but alongside html/css/javascript for more control and flexibility on the front end. </p>
+
+  <h2> Environments and Deployment </h2>
+
+
 
   <h2>File Structure</h2>
   <p>Flask is structure-neutral, meaning that apps can be anything from a single module to a large package. After a minor amount of confusion and restructuring, dividing my code into the following files seemed to work best: </p>
@@ -55,23 +62,14 @@ p {
 
   	<li><b>config.py: </b> configures environment variables for deployment. This is determined by another variable, 'APP SETTINGS', that pulls the database URI and secret key from the os. This will be important when deploying to the cloud. The config file also sets some variables separately for development, staging and production environments -- probably overkill here, but nice to be aware of. 
 
-  	<li> 
+  	<li><b>manage.py: </b> configures app, creates and runs migration files (used when you need to make changes to your database)</li>
 
-  	<li><b>templates (index.html, etc.): </b> the files that get rendered by the view function when a GET or POST request is recieved. The view passes the graph data/formatting to Plotly as a JSON. I added a drop-down that renders the index template with a different plot based on the selected value. Since my formatting is relatively basic, I included the CSS within my html headers rather than creating a separate style sheet. </li>
+  	<li><b>views.py: </b> handles requests and defines functions that render the templates, as well as passing them relevant variables (the JSON-ified plot data)  
 
-  	<li><b>manage.py: </b> configures app, creates and runs migration files (what you use when you need to make changes to your database)</li>
+  	<li><b>index.html: </b> the files that get rendered by views.py when a GET or POST request is recieved. The main challenge here was the drop-down menu. Each menu option is associated with a different function in my 'views.py', so the template is rendered with a totally different plot each time. The other option was the dropdown functionality within Plotly, but this requires all the data to be loaded at once, and then filtered on the page itself (based on a list of booleans). This would have been cumbersome to code since I have a large number of traces on the same plot. My solution also allows me to limit the amount of data that's loaded each time, for optimization of loading time vs. pretty graphs. 
+  	</li>
+
   </ul>
-
-  <h2>Interacting with the Database</h2>
-
-  <p> The dashboard uses tables for current and forecast weather conditions that are each indexed by a datetime column. The Forecasts table has an additional 'retrieval time' column as part of the primary key, which allows me to calculate the difference between the time a forecast is for (the id), and when it was downloaded. </p>
- 
-  <h2>Deployment</h2>
-
-  <h2>Scheduling Updates</h2>
-
-
-  <p><b>
   </p>  
 </div>
 </body>

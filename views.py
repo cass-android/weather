@@ -25,32 +25,27 @@ def project():
 
 @app.route('/', methods=['GET'])
 def index():
-	timeframes = []	
 	try:
 		option = request.args.get("timeframes", type=str) # gets the value of 'timeframes' (the submitted form that makes the request)
 
 		if option == 'Future':
 			return render_template(
     				'index.html', 
-    				timeframes=timeframes, 
     				plot=create_plot(skip=3, linewidth=4, hoursBack=12, hoursForward=120, maxHoursOut=121)
     				)	
 		elif option == 'Past':
 			return render_template(
     				'index.html', 
-    				timeframes=timeframes, 
-    				plot=create_plot(skip=3, linewidth=4, hoursBack=144, hoursForward=0, maxHoursOut=121),
+    				plot=create_plot(skip=4, linewidth=4, hoursBack=144, hoursForward=0, maxHoursOut=121),
     				)
 		elif option == 'All':
 		    return render_template(
 				    'index.html', 
-				    timeframes=timeframes, 
 				    plot=create_plot(skip=4, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
 				    )
 		else:
 		 return render_template(
     				'index.html', 
-    				timeframes=timeframes, 
     				plot=create_plot(skip=4, linewidth=4, hoursBack=84, hoursForward=96, maxHoursOut=121),
     				)
 
@@ -95,7 +90,7 @@ def create_now():
 	nowtrace = go.Scatter(
 		x=x,
 		y=y,
-		name='current time',
+		name='current hour',
 		mode='lines',
 		showlegend=False,
 		line=dict(
@@ -171,8 +166,11 @@ def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOu
 
         # crimson '#DC143C'
         mix=1-hour/maxHoursOut
+        
 
+        
         rel_set = go.Scatter(
+        	text=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[2],
             x=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[0],
             y=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[1],
             name='forecast {} h out'.format(hour),
@@ -181,7 +179,8 @@ def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOu
                 color = (colorFader(c1,c2,mix)),
                 width = (linewidth*1.5)*(1/hour)**(6/8),
                 ),
-            hoverinfo='x+y',
+            hovertemplate='forecast on %{text}',
+            hoverinfo='text',
             showlegend=True
             )
         data.append(rel_set)
@@ -200,5 +199,6 @@ def relative_set(hoursOut, hoursBack, hoursForward):
 
     x = [x.id for x in query]
     y = [x.drybulb for x in query]
+    t = [x.retrieval_time for x in query]
 
-    return x,y
+    return x,y,t

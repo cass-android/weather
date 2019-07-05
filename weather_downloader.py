@@ -10,24 +10,29 @@ from app import db
 from models import Forecast, Current
 
 def add_current():
-    session = db.session     # Creates a SQLAlchemy Session
-        
+    session = db.session         # creates a SQLAlchemy Session
+    this_hour = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
+    
     try:
         row = get_current()
-        data = Current(
+        new_data = Current(
             id=row['id'], 
             drybulb=row['drybulb'], 
             relative_humidity=row['relative_humidity']
             )
-        session.merge(data)
-        session.commit()
+        session.merge(new_data) # adds new currents
+        
+        Current.query.filter(
+            Current.id < this_hour - datetime.timedelta(hours=200)
+        ).delete                # deletes old currents
+        
+        session.commit()       # commits changes to db
 
     except:
-        print('something messed up')
-
+        flash('something messed up')
 
 def add_forecasts():
-    session = db.session     # Creates a SQLAlchemy Session
+    session = db.session        # creates a SQLAlchemy Session
         
     try:
         df = get_forecasts()
@@ -38,11 +43,15 @@ def add_forecasts():
                             drybulb=row[2], 
                             relative_humidity=row[3]
                             )
-            session.merge(data)
-            session.commit()
+            session.merge(data) # adds new forecasts
+            Forecast.query.filter(
+                Forecast.id < this_hour - datetime.timedelta(hours=200)
+            ).delete()          # deletes old forecasts
+            
+            session.commit()    # commits changes to db
 
     except:
-        print('something messed up') 
+        flash('something messed up')
 
 # current weather
 def get_current():
@@ -54,7 +63,7 @@ def get_current():
              'relative_humidity':r['main']['humidity']}
         return row
     else:
-        print('Error!')
+        flash('Error!')
 
 
 def get_forecasts():
@@ -77,6 +86,6 @@ def get_forecasts():
         return df[['retrieval_time','drybulb', 'relative_humidity']]        
 
     else:
-        print('Response Error')
+        flash('Response Error')
 
 
