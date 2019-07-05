@@ -1,10 +1,9 @@
 import pandas as pd
 import datetime
 import requests
-import re
-from bs4 import BeautifulSoup as bs
 from dateutil.relativedelta import *
 from sqlalchemy import create_engine
+from flask import flash
 import os
 from app import db
 from models import Forecast, Current
@@ -33,6 +32,7 @@ def add_current():
 
 def add_forecasts():
     session = db.session        # creates a SQLAlchemy Session
+    this_hour = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
         
     try:
         df = get_forecasts()
