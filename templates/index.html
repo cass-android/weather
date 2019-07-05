@@ -70,8 +70,8 @@ $(function(){
 <body>
 <div class="header">
   <p style="font-size:25px;text-align: center;margin: 10px 0px 0px 0px;">Weather Forecast Tracker</p>  
-  <p style="font-size:20px;text-align: center;margin: 10px 0px 0px 0px;">Data from <a href="https://openweathermap.org/api"target="_blank">openweathermap.org </a> for Toronto, ON</p>
-  <a href="project" style="float: right;margin: -35px 0px 0px 0px;">More About This Project</a>
+  <p style="font-size:20px;text-align: center;margin: 10px 0px 0px 0px;">Forecasts and Actuals from <a href="https://openweathermap.org/api"target="_blank">openweathermap.org </a> (Toronto, ON) </p>
+  
   <form action = "/" method = "GET"style="float: left;margin: -35px 0px 0px 0px;">
     <select name= timeframes onchange="this.form.submit()">
         <option value= "Past" >Past</option>
@@ -86,10 +86,11 @@ $(function(){
   </div>  
 </div>
 <div class="paragraph">
-  <p> The goal of this project was to visualize the magintude of updates to a frequently-changing forecast.
- Current weather conditions and a five-day forecast are retrieved hourly. Forecasts are plotted and colorized, with bluer lines show predictions made further back in time. </p>
+  <p> The goal of this project is to track and visualize updates to frequently-changing forecast. </p>
 
-  <p>We can clearly see that the forecast values all seem to lag the actual temperature changes. It is unclear whether this is an artifact, or indicative of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a>, or whether we've just been having unusually warm mornings. </p>
+  <p> A five-day forecast, along with current weather conditions, is retrieved every hour. Each forecast is plotted and colorized, with bluer lines showing predictions made further back in time.</p> 
+
+  <p> You can read more about this project <a href="project" style="margin: -35px 0px 0px 0px;"> here. </a>  </p>
 
 </div>
 </body>

@@ -24,7 +24,7 @@ def add_current():
         
         Current.query.filter(
             Current.id < this_hour - datetime.timedelta(hours=200)
-        ).delete                # deletes old currents
+        ).delete()                # deletes old currents
         
         session.commit()       # commits changes to db
 
@@ -44,11 +44,12 @@ def add_forecasts():
                             relative_humidity=row[3]
                             )
             session.merge(data) # adds new forecasts
-            Forecast.query.filter(
-                Forecast.id < this_hour - datetime.timedelta(hours=200)
-            ).delete()          # deletes old forecasts
-            
-            session.commit()    # commits changes to db
+
+        Forecast.query.filter(
+            Forecast.id < this_hour - datetime.timedelta(hours=190)
+        ).delete()          # deletes old forecasts
+        
+        session.commit()    # commits changes to db
 
     except:
         flash('something messed up')

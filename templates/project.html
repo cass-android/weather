@@ -35,19 +35,15 @@ p {
 </div> 
 
   <h2> Overview </h2>
-  <p> Apart from reinforcing the known fact that weather forecasts are not very reliable, the goal of this project was to demonstrate a simple cloud-hosted application that can query an API, interact with a database through an ORM, and can display up-to-date information. It was primarily a learning exercise, aimed at getting past that initial hurdle of figuring out how all the pieces fit together.</p>
+  <p> Apart from reinforcing the known fact that weather forecasts are not very reliable, the goal of this project was to demonstrate a simple cloud-hosted application that can query an API, interact with a database through an ORM, and can display up-to-date information. In those regards it was primarily a learning exercise, aimed at getting past that initial hurdle of figuring out how pieces fit together.</p>
 
-  <h2>Project Scope</h2>
-  The project had its origins in other work involving weather data (e.g archiving bulk historical data from <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"> the Government of Canada</a>). My data model quickly narrowed down from 'all the weather everywhere' to just the Toronto temperature forecasts and recent actuals. I wanted to build something with some back-end automation and a cool dashboard. So I followed a question that was interesting to me, to what extent and how often does the weather forecast change. Maybe not rocket science, but an intuitive way to visualize the actual predictive power of any  time-series forecast that is purported to be highly accurate. <p>
+  <h2> Scope </h2>
+  The project had its origins in other work involving weather data (e.g archiving bulk historical data from <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"> the Government of Canada</a>). My data model quickly narrowed down from 'all the weather everywhere' to just the Toronto temperature forecasts and recent actuals. I wanted to build something with some back-end automation and a cool dashboard. So I followed a question that was interesting to me, to what extent and how often does the weather forecast change.  intuitive way to visualize the actual predictive power of any  time-series forecast that is purported to be highly accurate. <p>
 
-
-  <h2> Frameworks and Decisions </h2>
+  <h2> Building an Application </h2>
   <p> Although <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank"> there will always be naysayers, </a> a framework is generally a good starting point for building a web app. Since I alread had some work done in Python, I looked to Flask and Django (the best-known Python frameworks). Django can quickly generate a robust application with many utilities out of the box. Flask is much more minimalist and open-ended, leaving it up to the developer to structure the app and include additional packages as needed. I opted for Flask since Django seemed like overkill. </p>
 
   <p> As a site note, other (and potentially more powerful) Python frameworks abound. Applications making use of<a href= "https://hackernoon.com/a-simple-introduction-to-pythons-asyncio-595d9c9ecf8c"target="_blank">asyncio</a>, for example, would have to go beyond what Flask or Django can offer. However, both Flask and Django have been around a while and have plentiful support and documentation. Specific to analytic apps, <a href='https://plot.ly/products/dash/'target="_blank"> Plotly Dash </a> is a framework that minimizes the need for javascript. I used the Plotly library within my Flask app to create the plot itself, but alongside html/css/javascript for more control and flexibility on the front end. </p>
-
-  <h2> Environments and Deployment </h2>
-
 
 
   <h2>File Structure</h2>
@@ -70,6 +66,12 @@ p {
   	</li>
 
   </ul>
+
+  <h2> Analysis </h2>
+  One consistent observation is that the forecast values all seem to lag the actual temperature changes. It is unclear whether this is an artifact, or indicative of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a>, or whether we've just been having unusually warm mornings recently.
+
+
+
   </p>  
 </div>
 </body>
