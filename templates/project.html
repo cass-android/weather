@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
 <meta charset="UTF-8">
-<title>Weather Dashboard</title>
+<title> Weather Dashboard </title>
 <style>
 * {
   font-family: Arial, Helvetica, sans-serif;
@@ -25,53 +25,99 @@ p {
   text-align: justify;
 }
 
+li {
+  text-align: justify;
+}
+
+
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 </style>
 </head>
 <body>
   
 <div class="Header">
-  <h1> Building a Data-Driven App with Flask and Postgres </h1>
+  <h1> Building a Forecast Tracker with Flask, Plotly and PostgreSQL </h1>
   <a href="/"style="float:right">Back to Main Page</a>
 </div> 
 
-  <h2> Overview </h2>
-  <p> Apart from reinforcing the known fact that weather forecasts are not very reliable, the goal of this project was to demonstrate a simple cloud-hosted application that can query an API, interact with a database through an ORM, and can display up-to-date information. In those regards it was primarily a learning exercise, aimed at getting past that initial hurdle of figuring out how pieces fit together.</p>
+  <h2> Defining the Scope </h2>
+  <p> This goal of this project was to demonstrate a simple cloud-hosted application that can query an API, interact with a database through an ORM, and display up-to-date information. Python is the language I'm most comfortable in, and I think it lends itself well to a data-driven application. </p>
 
-  <h2> Scope </h2>
-  The project had its origins in other work involving weather data (e.g archiving bulk historical data from <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"> the Government of Canada</a>). My data model quickly narrowed down from 'all the weather everywhere' to just the Toronto temperature forecasts and recent actuals. I wanted to build something with some back-end automation and a cool dashboard. So I followed a question that was interesting to me, to what extent and how often does the weather forecast change.  intuitive way to visualize the actual predictive power of any  time-series forecast that is purported to be highly accurate. <p>
+  <p> To focus my efforts, I followed an interesting question: how often and to what extent does the weather forecast change? The idea was to provide an intuitive visualization of predictive power that can be extended to any time-series forecast.<p>
 
-  <h2> Building an Application </h2>
-  <p> Although <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank"> there will always be naysayers, </a> a framework is generally a good starting point for building a web app. Since I alread had some work done in Python, I looked to Flask and Django (the best-known Python frameworks). Django can quickly generate a robust application with many utilities out of the box. Flask is much more minimalist and open-ended, leaving it up to the developer to structure the app and include additional packages as needed. I opted for Flask since Django seemed like overkill. </p>
+  <p> Comparing past forecasts requires saving them, so some kind of storage would be needed. Postgres was my tool of choice, but any relational database would serve equally well. I'm currently using Heroku's free storage platform, but this limits the number of rows rather than the size of the data itself (I did not realize this when I started). In retrospect, using a non-relational datastore might have helped with this situation, but this is something I can experiment with going forward. </p>
 
-  <p> As a site note, other (and potentially more powerful) Python frameworks abound. Applications making use of<a href= "https://hackernoon.com/a-simple-introduction-to-pythons-asyncio-595d9c9ecf8c"target="_blank">asyncio</a>, for example, would have to go beyond what Flask or Django can offer. However, both Flask and Django have been around a while and have plentiful support and documentation. Specific to analytic apps, <a href='https://plot.ly/products/dash/'target="_blank"> Plotly Dash </a> is a framework that minimizes the need for javascript. I used the Plotly library within my Flask app to create the plot itself, but alongside html/css/javascript for more control and flexibility on the front end. </p>
+  <h2> Getting the Data </h2>
+  <p> <a href="https://openweathermap.org/api"target="blank">Openweathermap.org</a> provides free access to current data and forecasts for 5 days ahead at 3 hour intervals. More granular forecasts, as well as access to historical data, require a subscription. For Canadian locations the government provides access to <a href="http://climate.weather.gc.ca/index_e.html"target="blank"> historical data</a> as well as <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"target="blank">local forecasts.</a> However, this data may be more difficult to access. <p>
 
+  <p> The openweathermap data seemed sufficient for this project, and their API is very simple to use. Once we have a key, we can use the Python requests package to pull the data in json form. For those unfamiliar with json, this is a very common data structure that can be indexed the same way we do a Python dictionary:</p>
 
-  <h2>File Structure</h2>
-  <p>Flask is structure-neutral, meaning that apps can be anything from a single module to a large package. After a minor amount of confusion and restructuring, dividing my code into the following files seemed to work best: </p>
+  <img src="static/addforecasts1.png" alt="code for getting forecasts" width="800"> 
+
+  <p> Here we're using keys to index the json and map the fields to those in our Forecast data model. We're also adding a column called 'retrieval time' with the hour when the data was pulled, for reasons that should become clear soon.  </p>
+
+  <h2> Building the App </h2>
+  <p> Apart from maybe <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank">this guy</a>, most of us want to start with some kind of framework. Flask and Django are the most well-known Python frameworks. Django can quickly generate a robust application with many utilities out of the box. Flask has a much more minimalist starting point, leaving it open to the developer to bring in additional packages as needed. Both Django and Flask have been around a while and have great support and documentation, but these are far from the only options. For analytics apps specifically, <a href='https://plot.ly/products/dash/'target="_blank">Plotly Dash</a> is a microframework built around the Plotly graphing library. Dash allows dashboard applications to be built completely in Python. </p>
+
+  <p> I settled on Flask for this project, since Django seemed to have more than I needed here and Plotly/Dash alone seemed a little bit limiting. I ended up working with the Plotly library, but alongside html/css/javascript for more flexibility. </p>
+
+  <p> File structures in Flask can be anything from a single module to a large package similar to what we'd typically see in Django, Rails, etc. I settled on something in between, that would allow me to better understand how the pieces fit together without drowning in files and folders that don't actually get used. These are the pieces that I finally landed on: </p>
 
   <ul>
-  	<li><b>main.py: </b> basically the ‘on’ switch that launches the app. A lot of examples I looked at included this within the app.py file. This was causing circularity problems for me, since app.py is imported by a number of other modules. The best solution seemed to be including it in a separate file. </li>
+  	<li><b> main.py: </b> Basically the ‘on’ switch that launches our app on the server. A lot of examples include this within the app.py file. Doing this kept causing circular import errors, since app.py is imported by a number of other modules. I solved the problem by moving this code into its own file (a similar structure is outlined <a href="https://charlesleifer.com/blog/structuring-flask-apps-a-how-to-for-those-coming-from-django/"targe="blank">here</a>). </li>
 
-  	<li><b>app.py: </b> the module that contains the Flask instance and the database. I started thinking of this as the brain stem of the app, while main.py is the actual spark of consciousness. </li>
+  	<li><b> app.py: </b> Our Flask instance and database connection (or actually, a SQLAlchemy instance bound to our Flask instance). I started thinking of this file as the brain stem of the app, while <b>main.py</b> is like consciousness itself. Kind of a strange analogy, but helped me keep track of what was what. </li> 
+  	 
+  	<li><b> config.py: </b> Determines what enviornment variables to pull from the OS (e.g. database URI and a secret key). Having these settings allows us to point to different variables in different deployment environments (e.g. development, staging, production). Our deployment database will be in a different location than our development database, so our app needs to be told by its environment where to look. </li>
 
-  	<li><b>models.py: </b> where the data models live. Here we define classes that create model objects representing the tables in our relational database. We can then interact with our database through these model objects. Models are created as children of the Model class in the Flask-SQLAlchemy extension. </li>
+  	<li><b> models.py: </b> Where our data models live. Data models are objects that are mapped to the tables in our relational database. To do this, we define classes that are children of the Model class, which we import from the Flask-SQLAlchemy extension. We can then interact with our database through the SQLAlchemy ORM. The code below defines the (very simple) model that represents our 'forecasts' table in Postgres. The 'id' is a timestamp of when the forecast is for, and the 'forecast retrieval time' is a timestamp created when the forecast is pulled: </li>
 
-  	<li><b>config.py: </b> configures environment variables for deployment. This is determined by another variable, 'APP SETTINGS', that pulls the database URI and secret key from the os. This will be important when deploying to the cloud. The config file also sets some variables separately for development, staging and production environments -- probably overkill here, but nice to be aware of. 
+  	<img src="static/models.png" alt="data model for forecast table" width="600"> 
 
-  	<li><b>manage.py: </b> configures app, creates and runs migration files (used when you need to make changes to your database)</li>
+    <p> Then, a separate module updates our database every hour. I'm still learning the nuances of SQLAlchemy and its implementation in Flask, but the following code seems to be doing what I need: </p>
 
-  	<li><b>views.py: </b> handles requests and defines functions that render the templates, as well as passing them relevant variables (the JSON-ified plot data)  
+    <img src="static/addforecasts2.png" alt="code for adding forecasts" width="600"> 
 
-  	<li><b>index.html: </b> the files that get rendered by views.py when a GET or POST request is recieved. The main challenge here was the drop-down menu. Each menu option is associated with a different function in my 'views.py', so the template is rendered with a totally different plot each time. The other option was the dropdown functionality within Plotly, but this requires all the data to be loaded at once, and then filtered on the page itself (based on a list of booleans). This would have been cumbersome to code since I have a large number of traces on the same plot. My solution also allows me to limit the amount of data that's loaded each time, for optimization of loading time vs. pretty graphs. 
-  	</li>
+    <p> Breaking this down further, we're doing the following: 
+    	<ol> 
+    		<li> Creating a Flask-SQLAlchemy session (which is basically a <a href="https://stackoverflow.com/questions/974596/what-is-a-database-transaction"target="blank">database transaction</a>)
+
+    		<li> Mapping the openweather data to our data model, as described above, and adding each row to the session </li>
+
+    		<li> Deleting records older than 190 hours from our database (to stay within Heroku's row limit restriction)</li>
+
+    		<li> Committing the session. Behind the scenes, SQLAlchemy translates the above into SQL statements and executes them. </li>
+    	</ol>
+	</p>
+
+  	<li><b> manage.py: </b> This creates and runs our database migrations. A new migration file containing the relevant SQL commands is saved each time we alter the architecture of our database (not the data itself). The migrations are a reversible record of each change, so that when we move between platforms we can update our schema with minimal impact to the underlying data. While we build and maintain our app, we are working with two copies of the same relational database: the production database that's hosted on Heroku (for now), and the development database on my local machine. These will have different data, since the production db is live and updating itself 24/7. But obviously we want them to have the same structure. So each time we deploy our app, we run our migrations to ensure our schemas are synchronized. To make things easier, Flask uses a tool called Alembic to create the migration files for us, based on what we've specified in our <b> models.py </b> file. Still, it's important to review the migrations before running them.  </li>
+
+  	<li><b> templates (index.html, etc): </b> These are the files that get rendered when a GET or POST request is recieved. Flask by default looks for these in a folder called 'templates'. Our templates interact closely with <b> views.py </b>, where we define functions that tell them what to display. For example, I've created a drop-down menu where each option sends a GET request that triggers a different function in views. I have my Javascript and CSS in my templates, but in a larger app these could go in their own files. 
+  	</li> 
+
+  	<li><b> views.py: </b> This is the link between our views and the rest of the app. Here we handle requests, pull the appropriate data from our back end and pass it to our front end. </li>  
+
+  	<p> For example, the function below queries our database and returns a set of forecasts for each line on the graph (for some reason this is called a trace): </p>
+
+    <img src="static/views1.png" alt="relative set function" width="650" > 
+
+    <p> We then add each trace to our figure, along with formatting, and convert it into a JSON to be rendered in our templates: </p>
+
+    <img src="static/views2.png" alt="create plot function" width="650"> 
 
   </ul>
 
-  <h2> Analysis </h2>
-  One consistent observation is that the forecast values all seem to lag the actual temperature changes. It is unclear whether this is an artifact, or indicative of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a>, or whether we've just been having unusually warm mornings recently.
+  <h2> Analysis and Next Steps</h2>
+  
+  <p> One observation is that the forecast values seem to consistently lag the actual temperature changes, especially in the mornings. The reason for this remains to be determined. One theory is the use of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a>. It's also possible we've just been having unusually warm mornings. </p>  
+
+  <p> It would be interesting to archive this data over a long period of time for further analysis. Heroku's free data stores are somwewhat limiting, so I'm thinking of moving the database over to another provider. I may also revisit the intervals at which forecasts are updated, as this would allow a longer time period to be stored. Performance and loading time could also be improved. </p>
 
 
-
-  </p>  
 </div>
 </body>

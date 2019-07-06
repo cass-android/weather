@@ -5,7 +5,6 @@ from flask_migrate import Migrate, MigrateCommand
 from app import app, db
 from models import Forecast, Current
 
-app.config.from_object(os.environ['APP_SETTINGS'])
 
 migrate = Migrate(app, db)
 manager = Manager(app)

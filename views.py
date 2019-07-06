@@ -26,7 +26,7 @@ def project():
 @app.route('/', methods=['GET'])
 def index():
 	try:
-		option = request.args.get("timeframes", type=str) # gets the value of 'timeframes' (the submitted form that makes the request)
+		option = request.args.get("timeframes", type=str) # gets the value of 'timeframes' from the form that submits request
 
 		if option == 'Future':
 			return render_template(
@@ -52,7 +52,7 @@ def index():
 	except Exception as e:
 		return str(e)
    
-def colorFader(c1,c2,mix=0): #fade (linear interpolate) from color c1 (at mix=0) to c2 (mix=1)
+def colorFader(c1,c2,mix=0): 
     c1=np.array(mpl.colors.to_rgb(c1))
     c2=np.array(mpl.colors.to_rgb(c2))
     return mpl.colors.to_hex((1-mix)*c1 + mix*c2)
@@ -103,7 +103,7 @@ def create_now():
 
 def create_actuals(linewidth, hoursBack, showlegend=False):
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
-    # actuals
+
     x0 = [x.id for x in Current.query.filter(
     	Current.id >= now - datetime.timedelta(hours=hoursBack)
     	).order_by(Current.id)]
@@ -126,49 +126,18 @@ def create_actuals(linewidth, hoursBack, showlegend=False):
 
     return actuals
 
-def create_latest_forecast(hoursBack, hoursForward, linewidth=3):
-# Creates trace for most recent forecast only; currently not used
-
-    now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
-    query = Forecast.query.filter(
-        Forecast.id >= now - datetime.timedelta(hours=hoursBack),
-        Forecast.id <= now + datetime.timedelta(hours=hoursForward),
-        Forecast.retrieval_time == db.session.query(func.max(Forecast.retrieval_time))[0]            
-    ).order_by(Forecast.id)
-
-
-    latest = go.Scatter(
-        x = [x.id for x in query],
-        y = [x.drybulb for x in query],
-        name='latest forecast',
-        mode='lines',
-        line=dict(
-            color = '#000000',
-            width = linewidth,
-            ),
-        hoverinfo='x+y',
-        showlegend=True
-        )
-
-    return latest
-
 
 def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOut=192):
     data=[create_actuals(linewidth=linewidth, hoursBack=hoursBack), create_now()]
     hourWindow=range(1,maxHoursOut)[::skip]
     
-
     for hour in hourWindow:
-
-        # Colour gradient
-        c1= '#000099' #more distant
-        c2= '#FF0000'
-
-        # crimson '#DC143C'
+        # Defines parameters for colour gradient (uses linear interpolation)
+        c1= '#000099' # more distant forecasts
+        c2= '#FF0000' # nearer forecasts
         mix=1-hour/maxHoursOut
         
-
-        
+        # Creats Plotly graph object for each forecast set
         rel_set = go.Scatter(
         	text=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[2],
             x=relative_set(hoursBack=hoursBack, hoursOut=hour, hoursForward=hoursForward)[0],
@@ -185,11 +154,14 @@ def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOu
             )
         data.append(rel_set)
     
+    # Combines graph objects into a figure that's sent to our template
     fig = go.Figure(data=data, layout=create_layout())
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return graphJSON
 
 def relative_set(hoursOut, hoursBack, hoursForward):
+# returns a set of forecasts within a specified time window, with retrieval time relative to forecast id
+
     now = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)       
     query = Forecast.query.filter(
         Forecast.id >= now - datetime.timedelta(hours=hoursBack),
