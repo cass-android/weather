@@ -8,5 +8,3 @@ import os
 
 if __name__ == '__main__':
     app.run()
-
-app.config.from_object(os.environ['APP_SETTINGS'])

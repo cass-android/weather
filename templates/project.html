@@ -46,7 +46,7 @@ img {
 </div> 
 
   <h2> Defining the Scope </h2>
-  <p> This goal of this project was to demonstrate a simple cloud-hosted application that can query an API, use an ORM to interact with a database, and display up-to-date information. Python is the language I'm most comfortable with, and I think it lends itself well to an application like this one. </p>
+  <p> This goal of this project was to demonstrate a simple cloud-hosted application that can query an API, use an ORM to interact with a database, and display up-to-date information.  </p>
 
   <p> To focus my efforts, I followed an interesting question: how often and to what extent does the weather forecast change? The idea was to provide an intuitive visualization of predictive power that can be extended to any time-series forecast.<p>
 
@@ -55,18 +55,18 @@ img {
   <p> What can we see in this data? One observation is that the forecast values seem to consistently lag the actual temperature changes, especially in the mornings. The reason for this remains to be determined. One theory is the use of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a>. It's also possible we've just been having unusually warm mornings. </p> 
 
   <h2> Getting the Data </h2>
-  <p> <a href="https://openweathermap.org/api"target="blank">Openweathermap.org</a> provides free access to current data and forecasts for five days ahead at three hour intervals. More granular forecasts, as well as access to historical data, require a subscription. For Canadian locations the government provides access to <a href="http://climate.weather.gc.ca/index_e.html"target="blank"> historical data</a> as well as <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"target="blank">local forecasts.</a> However, this may be more difficult to access. <p>
+  <p> <a href="https://openweathermap.org/api"target="blank">Openweathermap.org</a> provides free access to current data and forecasts for five days ahead at three hour intervals. More granular forecasts, as well as access to historical data, require a subscription. For Canadian locations the government provides <a href="http://climate.weather.gc.ca/index_e.html"target="blank"> historical data</a> as well as <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"target="blank">local forecasts.</a> However, I'm not sure if they have any kind of API. <p>
 
   <p> The OpenWeather data seemed sufficient for this project, and their API is very simple to use. Once we have a key, we can use the Python requests package to pull the data in json form. For those unfamiliar with json, this is a very common data structure that can be indexed the same way we do a Python dictionary:</p>
 
   <p><img src="static/addforecasts1.png" alt="code for getting forecasts" width="800"> </p>
 
-  <p> Here we're using keys to index the json and map the fields to those in our Forecast data model. We're also adding a column called 'retrieval time' with the hour when the data was pulled, for reasons that should become clear soon. </p>
+  <p> Here we're using keys to index the json and map the fields to those in our 'Forecast' data model. We're also adding a column called 'retrieval time' with the hour when the data was pulled. </p>
 
   <h2> Building the App </h2>
   <p> Apart from maybe <a href="https://dev.to/gypsydave5/why-you-shouldnt-use-a-web-framework-3g24"target="_blank">this guy</a>, most of us want to start with some kind of framework. Flask and Django are the most well-known Python frameworks. Django can quickly generate a robust application with many utilities out of the box. Flask has a much more minimalist starting point, leaving it open to the developer to bring in additional packages as needed. Both Django and Flask have been around a while and have great support and documentation, but these are far from the only options. For analytic apps, <a href='https://plot.ly/products/dash/'target="_blank">Plotly Dash</a> is a microframework built around the Plotly graphing library. </p>
 
-  <p> I settled on Flask for this project: Django included more than I needed here, and Dash seemed like it might be limiting. I ended up working with the Plotly library within Flask, alongside html/css/javascript for more flexibility if I ever want to scale this into something more than a simple dashboard. </p>
+  <p> I settled on Flask for this project: Django included more than I needed here, and Dash seemed like it might be limiting. I ended up working with the Plotly library within Flask, alongside html/css/javascript for more flexibility (in case I ever want to scale this into something more than a simple dashboard). </p>
 
   <p> File structures in Flask can be anything from a single module to a large package similar to what we'd typically see in Django, Rails, etc. I settled on something in between, that would allow me to better understand how the pieces fit together without drowning in files and folders. These are the main pieces that I landed on: </p>
 
@@ -81,17 +81,17 @@ img {
 
   	</li>
 
-  	<li><b> main.py: </b> <p> This file is basically the ‘on’ switch that launches our app on the server. A lot of examples include this within the app.py file. Doing this kept causing circular import errors, since app.py is imported by a number of other modules. I solved the problem by moving this code into its own file (a similar structure is outlined <a href="https://charlesleifer.com/blog/structuring-flask-apps-a-how-to-for-those-coming-from-django/"target="blank">here</a>). </p>
+  	<li><b> main.py: </b> <p> This file is basically the ‘on’ switch that launches our app on the server. A lot of examples include this within the app.py file. For me this kept causing circular import errors, since app.py is imported by a number of other modules. I found it easier to move this code into its own file (a similar structure is outlined <a href="https://charlesleifer.com/blog/structuring-flask-apps-a-how-to-for-those-coming-from-django/"target="blank">here</a>). </p>
   	</li>
 
-  	<p><img src="static/main2.png" alt="main.py" width="800"> </p>
+  	<p><img src="static/main3.png" alt="main.py" width="800"> </p>
 
   	<li><b> app.py: </b> <p> Contains our Flask instance and database connection (or actually, a SQLAlchemy instance bound to our Flask instance). I started thinking of this file as the brain stem of the app, while <b>main.py</b> is what gives it consciousness. </p></li> 
 
     <p><img src="static/app.png" alt="app.py" width="800"> </p>
 
 
-  	<li><b> models.py: </b> <p> Where our data models live. Data models are objects that are mapped to the tables in our relational database. To do this, we define classes that are children of the Model class, which we import from the Flask-SQLAlchemy extension. We can then interact with our database through the SQLAlchemy ORM. The code below defines the (very simple) model that represents our 'forecasts' table in Postgres. The 'id' is a timestamp of when the forecast is for, and the 'forecast retrieval time' is a timestamp created when the forecast is pulled: </p></li>
+  	<li><b> models.py: </b> <p> Where our data models live. Data models are objects that are mapped to the tables in our relational database. In this file we define classes as children of the Model class, which we import from the Flask-SQLAlchemy extension. We can then interact with our database through the SQLAlchemy ORM. The code below defines the (very simple) model that represents our 'forecasts' table in Postgres. The 'id' is a timestamp of when the forecast is for, and the 'forecast retrieval time' is a timestamp created when the forecast is pulled: </p></li>
 
   	<p><img src="static/models2.png" alt="data model for forecast table" width="800"> </p>
 
@@ -127,7 +127,7 @@ img {
 
     <p><img src="static/views2.png" alt="create plot function" width="800"> </p>
 
-    <p> Finally, this lovely function tells it what to load based on the option that's been selected in our drop-down menu (see below): </p>
+    <p> Finally, this function tells it what to load based on the option that's been selected in our drop-down menu (see below): </p>
 
     <p><img src="static/views3.png" alt="route to page" width="800"> </p>
 
