@@ -149,7 +149,10 @@ def create_plot(skip=1, linewidth=4, hoursBack=168, hoursForward=120, maxHoursOu
                 color = (colorFader(c1,c2,mix)),
                 width = (linewidth*1.5)*(1/hour)**(6/8),
                 ),
-            hovertemplate='forecast on %{text}, %{y}'+'<extra></extra>',
+            hovertemplate='Forecast on: %{text}<br>' +
+                        'For: %{x}<br>'+
+                        'Temp: %{y} \u2103 <br>' +
+                        '<extra></extra>',
             showlegend=True
             )
         data.append(rel_set)
