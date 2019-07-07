@@ -36,7 +36,7 @@ def index():
 		elif option == 'Past':
 			return render_template(
     				'index.html', 
-    				plot=create_plot(skip=4, linewidth=4, hoursBack=144, hoursForward=0, maxHoursOut=121),
+    				plot=create_plot(skip=4, linewidth=4, hoursBack=144, hoursForward=0, maxHoursOut=96),
     				)
 		elif option == 'All':
 		    return render_template(
