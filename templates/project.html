@@ -46,11 +46,11 @@ img {
 </div> 
 
   <h2> Defining the Scope </h2>
-  <p> This goal of this project was to demonstrate a simple cloud-hosted application that can query an API, interact with a database through an ORM, and display up-to-date information. Python is the language I'm most comfortable in, and I think it lends itself well to a data-driven application. </p>
+  <p> This goal of this project was to demonstrate a simple cloud-hosted application that can query an API, interact with a database through an ORM, and display up-to-date information. Python is the language I'm most comfortable in, and I think it lends itself well to an application like this one. </p>
 
   <p> To focus my efforts, I followed an interesting question: how often and to what extent does the weather forecast change? The idea was to provide an intuitive visualization of predictive power that can be extended to any time-series forecast.<p>
 
-  <p> Comparing past forecasts requires saving them, so some kind of storage would be needed. Postgres was my tool of choice, but any relational database would serve equally well. I'm currently using Heroku's free storage platform, but this limits the number of rows rather than the size of the data itself (I did not realize this when I started). In retrospect, using a non-relational datastore might have helped with this situation, but this is something I can experiment with going forward. </p>
+  <p> Comparing past forecasts requires saving them, so some kind of storage would be needed. Postgres was my tool of choice, but any relational database would serve equally well. I'm currently using Heroku's free storage platform, but this limits the number of rows rather than the size of the data itself (I did not realize this when I started). In retrospect, using a non-relational datastore might have helped with this situation, so I may experiment with that going forward. </p>
 
   <h2> Getting the Data </h2>
   <p> <a href="https://openweathermap.org/api"target="blank">Openweathermap.org</a> provides free access to current data and forecasts for 5 days ahead at 3 hour intervals. More granular forecasts, as well as access to historical data, require a subscription. For Canadian locations the government provides access to <a href="http://climate.weather.gc.ca/index_e.html"target="blank"> historical data</a> as well as <a href="https://weather.gc.ca/mainmenu/weather_menu_e.html"target="blank">local forecasts.</a> However, this data may be more difficult to access. <p>
@@ -77,11 +77,11 @@ img {
 
   	<li><b> models.py: </b> Where our data models live. Data models are objects that are mapped to the tables in our relational database. To do this, we define classes that are children of the Model class, which we import from the Flask-SQLAlchemy extension. We can then interact with our database through the SQLAlchemy ORM. The code below defines the (very simple) model that represents our 'forecasts' table in Postgres. The 'id' is a timestamp of when the forecast is for, and the 'forecast retrieval time' is a timestamp created when the forecast is pulled: </li>
 
-  	<img src="static/models.png" alt="data model for forecast table" width="600"> 
+  	<img src="static/models2.png" alt="data model for forecast table" width="800"> 
 
     <p> Then, a separate module updates our database every hour. I'm still learning the nuances of SQLAlchemy and its implementation in Flask, but the following code seems to be doing what I need: </p>
 
-    <img src="static/addforecasts2.png" alt="code for adding forecasts" width="600"> 
+    <img src="static/addforecasts2.png" alt="code for adding forecasts" width="800"> 
 
     <p> Breaking this down further, we're doing the following: 
     	<ol> 
@@ -104,15 +104,15 @@ img {
 
   	<p> For example, the function below queries our database and returns a set of forecasts for each line on the graph (for some reason this is called a trace): </p>
 
-    <img src="static/views1.png" alt="relative set function" width="650" > 
+    <img src="static/views1.png" alt="relative set function" width="800" > 
 
     <p> We then add each trace to our figure, along with formatting, and convert it into a JSON to be rendered in our templates: </p>
 
-    <img src="static/views2.png" alt="create plot function" width="650"> 
+    <img src="static/views2.png" alt="create plot function" width="800"> 
 
   </ul>
 
-  <h2> Analysis and Next Steps</h2>
+  <h2> Analysis </h2>
   
   <p> One observation is that the forecast values seem to consistently lag the actual temperature changes, especially in the mornings. The reason for this remains to be determined. One theory is the use of a <a href="https://towardsdatascience.com/how-not-to-use-machine-learning-for-time-series-forecasting-avoiding-the-pitfalls-19f9d7adf424"target="_blank"target="_blank">persistence model </a>. It's also possible we've just been having unusually warm mornings. </p>  
 

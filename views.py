@@ -93,6 +93,7 @@ def create_now():
 		name='current hour',
 		mode='lines',
 		showlegend=False,
+		hoverinfo='x+name',
 		line=dict(
 			color =('#EFB805'),
 			width = 4)

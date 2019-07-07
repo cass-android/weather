@@ -54,7 +54,11 @@ def add_forecasts():
         r = response.json()
         session = db.session        # creates a SQLAlchemy Session
         this_hour = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
-        
+
+        Forecast.query.filter(
+            Forecast.id < this_hour - datetime.timedelta(hours=100)
+        ).delete()          # deletes old forecasts               
+
         for dt in r['list']:    
             data=Forecast(
                   id=dt['dt_txt'],
@@ -64,10 +68,7 @@ def add_forecasts():
             )
             session.merge(data) # adds new forecasts
             
-        Forecast.query.filter(
-            Forecast.id < this_hour - datetime.timedelta(hours=190)
-        ).delete()          # deletes old forecasts
-        
+ 
         session.commit() 
 
     else:
