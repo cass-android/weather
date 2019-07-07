@@ -56,7 +56,7 @@ def add_forecasts():
         this_hour = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
 
         Forecast.query.filter(
-            Forecast.id < this_hour - datetime.timedelta(hours=100)
+            Forecast.id < this_hour - datetime.timedelta(hours=190)
         ).delete()          # deletes old forecasts               
 
         for dt in r['list']:    
