@@ -35,7 +35,7 @@ def add_current():
         session.merge(new_data) # adds new currents
  
         Current.query.filter(
-            Current.id < this_hour - datetime.timedelta(hours=200)
+            Current.id < this_hour - datetime.timedelta(hours=150)
         ).delete()                # deletes old currents   
 
     except:
@@ -56,7 +56,7 @@ def add_forecasts():
         this_hour = datetime.datetime.now().replace(microsecond=0,second=0,minute=0)
 
         Forecast.query.filter(
-            Forecast.id < this_hour - datetime.timedelta(hours=190)
+            Forecast.id < this_hour - datetime.timedelta(hours=150)
         ).delete()          # deletes old forecasts               
 
         for dt in r['list']:    
